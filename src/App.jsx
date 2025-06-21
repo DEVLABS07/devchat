@@ -1,35 +1,64 @@
 import { useEffect } from 'react'
 import './App.css'
+import logo from './assets/react.svg'
 import axios from 'axios'
+import { BrowserRouter as Router, useNavigate } from 'react-router-dom'
+import { Route, Routes } from 'react-router-dom'
+import Login from './Login'
+
+
+function Lander() {
+   const navigate = useNavigate();
+   const fetchData = async () => {
+      const userMail = document.querySelector('.email').value;
+      if (!userMail.trim()) { alert('Please fill in all fields'); return; }
+      try {
+         const response = await axios.post('http://127.0.0.1:8000/user', {
+            usermail: userMail,
+         })
+         console.log(response.data);
+         if (response.data.message == 'User already exists.') {
+            localStorage.setItem('login', 'true');
+            navigate('/login');
+         } else {
+            localStorage.setItem('login', 'false');
+            navigate('/login');
+         }
+      }
+      catch (error) {
+         console.error('Error fetching data:', error);
+      }
+   }
+
+   return (
+      <div className="main-page">
+         <div className="login-box">
+            <div className="login-box-top">
+               <img src={logo} />
+               <h1>Login in to DevChat</h1>
+               <button>Login With Google</button>
+               <hr></hr>
+            </div>
+            <div className="login-box-bottom">
+               <input className='email' type="email" placeholder="Email" />
+               <button onClick={fetchData}>Login</button>
+            </div>
+
+         </div>
+      </div>
+   )
+}
 
 function App() {
 
-        const fetchData = async () => {
-         const userMail = document.querySelector('.email').value;
-         const password = document.querySelector('.password').value;
-         if(!userMail.trim() || !password.trim()){ alert('Please fill in all fields'); return; }
-            try{
-               const response = await axios.post('http://127.0.0.1:8000/login',{
-                  usermail: userMail ,
-                  password: password
-               })
-               console.log(response.data);
-            }
-            catch(error){
-               console.error('Error fetching data:', error);
-            }
-         }
-
-  return (
-     <div className="main-page">
-         <nav><h1>Login</h1></nav>
-         <div className="login-box">
-            <input className='email' type="email" placeholder="Username" />
-            <input className='password' type="password" placeholder="Password" />
-            <button onClick={fetchData}>Login</button>
-         </div>
-     </div>       
-  )
+   return (
+      <Router>
+         <Routes>
+            <Route path="/" element={<Lander />} />
+            <Route path="/login" element={<Login />} />
+         </Routes>
+      </Router>
+   )
 }
 
 export default App
