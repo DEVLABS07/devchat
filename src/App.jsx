@@ -1,34 +1,34 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { useEffect } from 'react'
 import './App.css'
+import axios from 'axios'
 
 function App() {
-  const [count, setCount] = useState(0)
+
+        const fetchData = async () => {
+         const userMail = document.querySelector('.email').value;
+         const password = document.querySelector('.password').value;
+         if(!userMail.trim() || !password.trim()){ alert('Please fill in all fields'); return; }
+            try{
+               const response = await axios.post('http://127.0.0.1:8000/login',{
+                  usermail: userMail ,
+                  password: password
+               })
+               console.log(response.data);
+            }
+            catch(error){
+               console.error('Error fetching data:', error);
+            }
+         }
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+     <div className="main-page">
+         <nav><h1>Login</h1></nav>
+         <div className="login-box">
+            <input className='email' type="email" placeholder="Username" />
+            <input className='password' type="password" placeholder="Password" />
+            <button onClick={fetchData}>Login</button>
+         </div>
+     </div>       
   )
 }
 
