@@ -1,0 +1,9 @@
+.login-box-bottom p{
+    padding-left: 15px;
+    text-decoration: underline;
+    cursor: pointer;
+}
+.login-box-bottom p:hover{
+    padding-left: 15px;
+    text-decoration: none;
+}

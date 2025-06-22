@@ -3,10 +3,17 @@ from fastapi.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
 from pydantic import BaseModel
 from passlib.context import CryptContext
+from random import randint
 import os
 from dotenv import load_dotenv
+import yagmail 
+
+
+
 load_dotenv()
 url = os.getenv("MONGO_URI")
+email = os.getenv("EMAIL")
+password = os.getenv("PASSWORD")
 
 app = FastAPI()
 app.add_middleware(CORSMiddleware,
@@ -25,6 +32,9 @@ class Login(BaseModel):
     password: str
 class User(BaseModel):
     usermail: str
+class otp(BaseModel):
+    usermail: str
+
 
 
 @app.post('/user')
@@ -57,4 +67,30 @@ async def login(user: Login):
             return {"error": "Invalid password."}
          
 
-   
+@app.post("/otp")
+async def send_otp(user: otp):
+    usermail = user.usermail
+    ya = yagmail.SMTP(email,password)
+    if not usermail:
+        return {"error": "Email is required."}
+    else:
+        random = randint(100000, 999999)
+        try:
+            send = ya.send(to=usermail, subject="OTP for DevChat", contents=f"Your OTP is {random}")
+        except Exception as e:
+            return { "details": str(e)}
+        return {"message": "OTP sent successfully.", "otp": random}
+    
+@app.post("/newpass")
+async def new_password(user: Login):
+    usermail = user.usermail
+    password = user.password
+    if not usermail or not password:
+        return {"error": "Email and password are required."}
+    user_data = await collection.find_one({"usermail": usermail})
+    if not user_data:
+        return {"error": "User does not exist."}
+    else:
+        new_password = pwd_context.hash(password)
+        await collection.update_one({"usermail": usermail}, {"$set": {"password": new_password}})
+        return {"message": "Password updated successfully."}

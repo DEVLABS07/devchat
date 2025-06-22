@@ -5,6 +5,7 @@ import axios from 'axios'
 import { BrowserRouter as Router, useNavigate } from 'react-router-dom'
 import { Route, Routes } from 'react-router-dom'
 import Login from './Login'
+import Forgot from './Forgot'
 
 
 function Lander() {
@@ -40,7 +41,9 @@ function Lander() {
                <hr></hr>
             </div>
             <div className="login-box-bottom">
-               <input className='email' type="email" placeholder="Email" />
+               <input className='email' type="email" placeholder="Email" autoComplete="off"
+                  autoCorrect="off"
+                  spellCheck="false" />
                <button onClick={fetchData}>Login</button>
             </div>
 
@@ -56,6 +59,7 @@ function App() {
          <Routes>
             <Route path="/" element={<Lander />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/forgot" element={<Forgot />} />
          </Routes>
       </Router>
    )
