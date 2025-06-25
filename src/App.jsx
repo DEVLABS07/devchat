@@ -1,6 +1,6 @@
 import { use, useEffect } from 'react'
 import './App.css'
-import logo from './assets/react.svg'
+import logo from './assets/logo.jpg'
 import axios from 'axios'
 import { BrowserRouter as Router, useNavigate } from 'react-router-dom'
 import { Route, Routes } from 'react-router-dom'
@@ -48,7 +48,7 @@ function Lander() {
          <div className="login-box">
             <div className="login-box-top">
                <img src={logo} />
-               <h1>Login in to DevChat</h1>
+               <h1>Login in to ThumbsUp</h1>
                <button onClick={signUp}>Sign Up</button>
                <hr></hr>
             </div>

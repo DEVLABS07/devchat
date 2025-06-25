@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import './App.css'
-import logo from './assets/react.svg'
+import logo from './assets/logo.jpg'
 import axios from 'axios'
 import './login.css'
 import { useState } from 'react';
@@ -59,7 +59,7 @@ function Login() {
             <div className="login-box">
                 <div className="login-box-top">
                     <img src={logo} alt="React Logo" />
-                    <h1>{login} to DevChat</h1>
+                    <h1>{login} to ThumbsUp</h1>
                     <hr />
                 </div>
                 <div className="login-box-bottom">

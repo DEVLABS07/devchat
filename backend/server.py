@@ -88,7 +88,7 @@ async def send_otp(user: otp):
     else:
         random = randint(100000, 999999)
         try:
-            send = ya.send(to=usermail, subject="OTP for DevChat", contents=f"Your OTP is {random}")
+            send = ya.send(to=usermail, subject="OTP for ThumbsUp", contents=f"Your OTP is {random}")
         except Exception as e:
             return { "details": str(e)}
         return {"message": "OTP sent successfully.", "otp": random}
