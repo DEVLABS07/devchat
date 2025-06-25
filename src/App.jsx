@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { use, useEffect } from 'react'
 import './App.css'
 import logo from './assets/react.svg'
 import axios from 'axios'
@@ -6,13 +6,20 @@ import { BrowserRouter as Router, useNavigate } from 'react-router-dom'
 import { Route, Routes } from 'react-router-dom'
 import Login from './Login'
 import Forgot from './Forgot'
+import Chat from './Chat'
 
 
 function Lander() {
    const navigate = useNavigate();
    const fetchData = async () => {
       const userMail = document.querySelector('.email').value;
-      if (!userMail.trim()) { alert('Please fill in all fields'); return; }
+      if (!userMail.trim() || !userMail.includes('@')) {
+         const useremail = document.querySelector('.email');
+         useremail.focus();
+         useremail.placeholder = 'Please enter your email';
+         useremail.style.border = '1px solid red';
+         return;
+      }
       try {
          const response = await axios.post('http://127.0.0.1:8000/user', {
             usermail: userMail,
@@ -31,13 +38,18 @@ function Lander() {
       }
    }
 
+   function signUp() {
+      localStorage.setItem('login', 'false');
+      navigate('/login');
+   }
+
    return (
       <div className="main-page">
          <div className="login-box">
             <div className="login-box-top">
                <img src={logo} />
                <h1>Login in to DevChat</h1>
-               <button>Login With Google</button>
+               <button onClick={signUp}>Sign Up</button>
                <hr></hr>
             </div>
             <div className="login-box-bottom">
@@ -60,6 +72,7 @@ function App() {
             <Route path="/" element={<Lander />} />
             <Route path="/login" element={<Login />} />
             <Route path="/forgot" element={<Forgot />} />
+            <Route path="/chat" element={<Chat />} />
          </Routes>
       </Router>
    )

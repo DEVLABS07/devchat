@@ -73,7 +73,6 @@ const Forgot = () => {
             alert("Failed to change password. Please try again.");
         }
 
-        console.log("New password set:", newPassword);
         alert("Password changed successfully!");
     }
 

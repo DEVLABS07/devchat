@@ -23,7 +23,14 @@ function Login() {
         const usermail = document.querySelector('.email').value;
         const password = document.querySelector('.password').value;
         if (!usermail.trim() || !password.trim()) {
-            alert('Please fill in all fields');
+            if(!usermail.trim()) {
+            const useremail = document.querySelector('.email');
+            useremail.style.border = '1px solid red';
+            }
+            if(!password.trim()) {
+            const userpassword = document.querySelector('.password');
+            userpassword.style.border = '1px solid red';
+            }
             return;
         }
         try {
@@ -32,15 +39,19 @@ function Login() {
                 password: password
             })
             console.log('Response:', response.data);
+            if(response.data.message == 'Login successful.'){
+                localStorage.setItem('user', usermail);
+                navigate('/chat');
+            }
+            else{
+                alert('Invalid Credentials');
+            }
         }
         catch (error) {
             console.log('Error fetching data:', error);
 
         }
     }
-
-
-
 
 
     return (
@@ -58,7 +69,7 @@ function Login() {
                     <input className='password' type="password" placeholder="Password" autoComplete="off"
                         autoCorrect="off"
                         spellCheck="false" />
-                    <p onClick={() => navigate('/forgot')}>Forgot Password?</p>
+                {login == 'Login'? <p onClick={() => navigate('/forgot')}>Forgot Password?</p>:''}   
                     <button onClick={fetchData}>{login}</button>
                 </div>
             </div>

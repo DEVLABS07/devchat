@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
 from pydantic import BaseModel
@@ -7,7 +7,6 @@ from random import randint
 import os
 from dotenv import load_dotenv
 import yagmail 
-
 
 
 load_dotenv()
@@ -22,10 +21,16 @@ app.add_middleware(CORSMiddleware,
     allow_headers=["*"],
     allow_methods=["*"])
 
+
 cluster = AsyncIOMotorClient(url)
 database = cluster["Authentication"]
 collection = database["login"]
+collection2 = database["History"]
+collection3 = database["Assignments"]
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+
+
 
 class Login(BaseModel):
     usermail: str
@@ -34,6 +39,13 @@ class User(BaseModel):
     usermail: str
 class otp(BaseModel):
     usermail: str
+class data(BaseModel):
+    Data: str
+class assign(BaseModel):
+    task: str
+    person: str
+class assignDel(BaseModel):
+    task: str
 
 
 
@@ -94,3 +106,47 @@ async def new_password(user: Login):
         new_password = pwd_context.hash(password)
         await collection.update_one({"usermail": usermail}, {"$set": {"password": new_password}})
         return {"message": "Password updated successfully."}
+    
+@app.post("/saveassign")
+async def save_assign(data:assign):
+    try:
+        save_assign = await collection3.insert_one({"task": data.task, "person": data.person})
+        return {"message": "Added Successfully"}
+    except Exception as e:
+        return {"Error": e}
+    
+@app.get("/getassign")
+async def get_assign():
+    try:
+        get_assign = await collection3.find({}).to_list(length=None)
+        for doc in get_assign:
+            doc["_id"] = str(doc["_id"])
+        return {"message": get_assign}
+    except Exception as e:
+        return {'Error':str(e)}
+
+@app.post("/deltask")
+async def del_assign(dela:assignDel):
+    try:
+        response = await collection3.delete_one({ "task":dela.task })
+        return {"message": "Successfully Deleted"}
+    except Exception as e:
+        return {"message": str(e)}
+    
+
+
+    
+clients = []
+
+@app.websocket('/ws')
+async def webserver(websocket:WebSocket):
+    await websocket.accept()
+    clients.append(websocket)
+    try:
+        while True:
+            message = await websocket.receive_json()
+            for client in clients:
+                if client!= websocket:
+                    await client.send_json(message)
+    except WebSocketDisconnect:
+                clients.remove(websocket)
