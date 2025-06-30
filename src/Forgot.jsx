@@ -2,9 +2,11 @@ import './forgot.css'
 import axios from 'axios'
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+
+
 const Forgot = () => {
     const navigate = useNavigate();
-    const [otp, setOtp] = useState();
+    const [otp, setOtp] = useState(false);
     useEffect(() => {
         if (otp) {
             const otpInput = document.querySelector('.otp');
@@ -26,7 +28,7 @@ const Forgot = () => {
         }
 
         try {
-            const response = await axios.post('http://127.0.0.1:8000/otp', { usermail: email });
+            const response = await axios.post('http://127.0.0.1:8000/saveotp', { usermail: email });
             alert(response.data.message);
             setOtp(response.data.otp);
         } catch (error) {
@@ -36,19 +38,25 @@ const Forgot = () => {
     }
 
 
-    const handleOTP = () => {
+    const handleOTP = async () => {
+        const passwordInput = document.querySelector('.passsword').value;
+        if (passwordInput) {
+            changePassword();
+            return;
+        }
+        const email = document.querySelector('input[type="email"]').value;
         const enteredOtp = document.querySelector('.otp').value;
-
-        if (enteredOtp == otp) {
+        const getotp = await axios.post('http://127.0.0.1:8000/checkotp', {
+            username: email,
+            otp: enteredOtp
+        })
+        console.log(getotp);
+        if (getotp.data.message == "OTP is Verified") {
             document.querySelector('.passsword').classList.toggle('password-active');
-            const passwordInput = document.querySelector('.passsword').value;
-            if (passwordInput) {
-                changePassword();
-            } else {
-                alert("Please enter a new password.");
-            }
+            alert("Please enter a new password.");
         } else {
             alert("Invalid OTP. Please try again.");
+            navigate('/login');
         }
     }
 

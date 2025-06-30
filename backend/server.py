@@ -7,7 +7,7 @@ from random import randint
 import os
 from dotenv import load_dotenv
 import yagmail 
-
+from typing import List
 
 load_dotenv()
 url = os.getenv("MONGO_URI")
@@ -25,8 +25,11 @@ app.add_middleware(CORSMiddleware,
 cluster = AsyncIOMotorClient(url)
 database = cluster["Authentication"]
 collection = database["login"]
-collection2 = database["History"]
+collection1 = database["Otp"]
 collection3 = database["Assignments"]
+collection4 = database["Chats"]
+collection5 = database["Groups"]
+collection6 = database["Requests"] 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
@@ -37,7 +40,7 @@ class Login(BaseModel):
     password: str
 class User(BaseModel):
     usermail: str
-class otp(BaseModel):
+class saveotp(BaseModel):
     usermail: str
 class data(BaseModel):
     Data: str
@@ -46,8 +49,73 @@ class assign(BaseModel):
     person: str
 class assignDel(BaseModel):
     task: str
+class Check(BaseModel):
+    username: str
+    otp: str
+class schema(BaseModel):
+    group: str
+    sender: str
+    message: str
+    key: int
+class chat(BaseModel):
+    group: str
+    messages: List[schema]
+class getChat(BaseModel):
+    group:str
+    
+class newGroup(BaseModel):
+    username: str
+    group: str
+    member: List
+
+class req(BaseModel):
+    username: str
+    group: str    
+    
+class reqCondition(BaseModel):
+    username: str
+    group: str
+    response: str
+    
+@app.post('/req')
+async def save_req(data:req):
+    try:
+        response = await collection6.insert_one({ "username": data.username, "group": data.group })    
+        return {"message" : "Request sent successfully"}
+    except Exception as e:
+        return {"Error": e}
+    
+@app.post('/getreqs')
+async def get_reqs(data:User):
+    try:
+        response = await collection5.find({"Admin":data.usermail}).to_list(length=None)
+        requests = []
+        for i in response:
+            reqs = await collection6.find({"group": i['Group']}).to_list(length=None)
+            for j in reqs:
+                j['_id']= str(j['_id'])
+                requests.append(j)
+        return {"message": requests}     
+    except Exception as e:
+        return {"Error": e}
 
 
+@app.post('/handreq')
+async def handle_request(data: reqCondition):
+    try:
+        condition = data.response
+        if condition == "reject":
+            response = await collection6.delete_one({"username": data.username, "group": data.group})
+            return {"Message": "Request Deleted Successfully"}
+        else:
+            group = await collection5.find_one({"Group": data.group})
+            newmem = group['Members']
+            newmem.append(data.username)
+            modify = await collection5.update_one({"Group": data.group}, {"$set":{"Members": newmem}})
+            await collection6.delete_one({"username": data.username, "group": data.group})
+            return {"Message": "Request Deleted Successfully"}            
+    except Exception as e:
+        return {"Error": e}
 
 @app.post('/user')
 async def check_user(user: User):
@@ -79,8 +147,8 @@ async def login(user: Login):
             return {"error": "Invalid password."}
          
 
-@app.post("/otp")
-async def send_otp(user: otp):
+@app.post("/saveotp")
+async def send_otp(user: saveotp):
     usermail = user.usermail
     ya = yagmail.SMTP(email,password)
     if not usermail:
@@ -89,10 +157,27 @@ async def send_otp(user: otp):
         random = randint(100000, 999999)
         try:
             send = ya.send(to=usermail, subject="OTP for ThumbsUp", contents=f"Your OTP is {random}")
+            saveOTP = await collection1.insert_one({"Otp":random,"username": usermail})
         except Exception as e:
             return { "details": str(e)}
-        return {"message": "OTP sent successfully.", "otp": random}
-    
+        return {"message": "OTP sent successfully.", "otp":True}
+
+@app.post("/checkotp")
+async def check_otp(check: Check):
+    try:
+        username = check.username
+        otp = check.otp
+        num = int(otp)
+        response = await collection1.find_one({ "username": username })
+        if num == response['Otp']:
+            response = await collection1.delete_one({"username": username})
+            return {"message": "OTP is Verified"}
+        else:
+            response = await collection1.delete_one({"username": username})
+            return {"message": "Invalid OTP"}
+    except Exception as e:
+        return {"Error": e}
+
 @app.post("/newpass")
 async def new_password(user: Login):
     usermail = user.usermail
@@ -132,21 +217,75 @@ async def del_assign(dela:assignDel):
         return {"message": "Successfully Deleted"}
     except Exception as e:
         return {"message": str(e)}
+
+@app.post("/savechat")
+async def saveChat(chatdata:chat):
+    try:
+        exist = await collection4.find_one({"group": chatdata.group})
+        if(exist):
+            modifydata = await collection4.update_one({"group": chatdata.group}, {"$set":{ "message": [msg.dict() for msg in chatdata.messages], "group": chatdata.group}})
+            return {"message": "Message Modified"}
+        else:
+            saveData = await collection4.insert_one({ "message": [msg.dict() for msg in chatdata.messages], "group": chatdata.group})
+            return {"message": "Messages Saved"}
+    except Exception as e:
+        return {"message": e}
     
+    
+@app.post("/getchat")
+async def getchat(data: getChat):
+    try:
+        response = await collection4.find_one({"group": data.group})
+        if response:
+            response['_id'] = str(response['_id'])
+        return {"Message": response}
+    except Exception as e:
+        return {"Error": e}
 
+@app.post("/newchat")
+async def newchat(data: newGroup):
+    try:
+        checkGroup = await collection5.find_one({"Group": data.group})
+        if(checkGroup):
+            return {"message": "Group Already Exists. Please Enter a different Group Name", "code": 123}
+        response = await collection5.insert_one({"Group": data.group, "Admin": data.username, "Members" : data.member})
+        return {"message": "Group Created"}
+    except Exception as e:
+        return {"Error": e}
+    
+@app.post("/getgroup")
+async def getchat(data: User):
+    try:
+        response = await collection5.find({"Members": data.usermail}).to_list(length = None)
+        if(response):
+            for i in response:
+                i['_id'] = str(i['_id'])
+            return {"message": response}
+    except Exception as e:
+        return {"Error": e} 
+    
+@app.get("/allgroups")
+async def getallchats():
+        response = await collection5.find({}).to_list(length=None)
+        if response:
+            for i in response:
+                i['_id'] = str(i['_id'])
+            return  {"Message": response}
 
     
-clients = []
+clients = {}
 
-@app.websocket('/ws')
-async def webserver(websocket:WebSocket):
+@app.websocket('/ws/{group}')
+async def webserver(websocket:WebSocket, group:str):
     await websocket.accept()
-    clients.append(websocket)
+    if group not in clients:
+        clients[group] = []
+    clients[group].append(websocket)
     try:
         while True:
             message = await websocket.receive_json()
-            for client in clients:
+            for client in clients[group]:
                 if client!= websocket:
                     await client.send_json(message)
     except WebSocketDisconnect:
-                clients.remove(websocket)
+                clients[group].remove(websocket)
