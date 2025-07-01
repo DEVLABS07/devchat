@@ -121,6 +121,7 @@ html {
     font-weight: 300;
     color: white;
 }
+
 .left-bottom ul li p {
     font-size: 12px;
     padding-left: 20px;
@@ -211,10 +212,7 @@ html {
     color: white;
     transition: .5s ease;
 }
-.t-right button span{
-    content: ' 3';
-    color:white;
-}
+
 
 .center-bottom {
     width: 95%;
@@ -477,7 +475,8 @@ html {
     list-style: none;
 }
 
-.search-nav ul li, .request-tab ul li {
+.search-nav ul li,
+.request-tab ul li {
     border: 1px solid #666161;
     width: 80%;
     height: 50px;
@@ -494,7 +493,8 @@ html {
     gap: 30px;
 }
 
-.search-nav ul li h1, .request-tab ul li h1 {
+.search-nav ul li h1,
+.request-tab ul li h1 {
     color: #666161;
     padding: 0px;
     font-size: 16px;
@@ -502,7 +502,8 @@ html {
 }
 
 
-.search-nav ul li button, .request-tab ul li button {
+.search-nav ul li button,
+.request-tab ul li button {
     padding: 7px;
     cursor: pointer;
     background-color: transparent;
@@ -511,7 +512,8 @@ html {
     border-radius: 30px;
 }
 
-.search-nav ul li button:hover,  .request-tab ul li button:hover {
+.search-nav ul li button:hover,
+.request-tab ul li button:hover {
     background-color: #1db954;
     color: white;
     transition: .5s ease;
@@ -589,22 +591,79 @@ html {
     padding-top: 20px;
     color: #1db954
 }
-.request-tab ul{
-    width:90%;
-    height:100%;
+
+.request-tab ul {
+    width: 90%;
+    height: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
 }
-.request-tab ul li h1{
+
+.request-tab ul li h1 {
     font-size: 12px;
 }
-.request-tab ul li button{
-    padding:5px;
+
+.request-tab ul li button {
+    padding: 5px;
     font-size: 10px;
 }
-.request-tab ul li{
-    width:100%;
-    padding:0px 10px;
-    gap:8px;
+
+.request-tab ul li {
+    width: 100%;
+    padding: 5px 10px;
+    gap: 8px;
+}
+
+.txt p {
+    font-size: 12px;
+    padding-left: 20px;
+    font-weight: 300;
+    color: white;
+    text-align: left;
+    padding-top: 5px;
+}
+
+.options {
+    width: 10%;
+    height: 40%;
+    background-color: transparent;
+    backdrop-filter: blur(20px);
+    border-radius: 20px;
+    position: absolute;
+    top: 115px;
+    border: 1px solid #1db954;
+    right: 22.5%;
+    display: flex;
+    flex-direction: column;
+    opacity: 0;
+    z-index: -1;
+    text-align: center;
+    align-items: center;
+    gap: 20px;
+}
+
+.options p {
+    color: white;
+    cursor: pointer;
+    padding-top:20px;
+}
+.options p:hover{
+    color: red;
+    transition: .5s ease;
+}
+.act {
+    opacity: 1;
+    z-index: 10000;
+}
+
+@media screen and (max-width:1150px) {
+    .left-top h1 {
+        font-size: 13px;
+    }
+
+    .left-top img {
+        width: 30px;
+        height: 30px;
+    }
 }

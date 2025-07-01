@@ -116,6 +116,25 @@ async def handle_request(data: reqCondition):
             return {"Message": "Request Deleted Successfully"}            
     except Exception as e:
         return {"Error": e}
+    
+@app.post('/exitgroup')
+async def exitgroup(data:req):
+    try:
+        response = await collection5.find_one({"Group": data.group})
+        members = response["Members"]
+        if response["Admin"] == data.username:
+            respond = await collection5.delete_one({"Group": data.group})
+            respond = await collection4.delete_one({"group": data.group})
+            return {"Message": "Successfully Deleted the Group"}
+        newmembers = []
+        for i in members:
+            if i != data.username:
+                newmembers.append(i)
+        newresponse = await collection5.update_one({"Group": data.group}, {"$set": {"Members": newmembers}})
+        return{"Message": "Successfully removed from the group"}
+                
+    except Exception as e:
+        return {"Error": e}    
 
 @app.post('/user')
 async def check_user(user: User):

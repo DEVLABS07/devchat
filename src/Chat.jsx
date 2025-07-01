@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import './Chat.css'
-import img from './assets/dp01.jpg'
+import img from './assets/dp02.jpg'
 import logo from './assets/logo.jpg'
 import axios from 'axios'
 
@@ -14,7 +14,6 @@ const Chat = () => {
     const [groupList, setGroupList] = useState([]);
     const [groupName, setGroupName] = useState(groupList[1]);
     const [searchData, setSearchData] = useState([]);
-    const [request, setRequest] = useState(false);
     const [searchActivate, setSearchActivate] = useState(false);
     const scrollRef = useRef(null);
     useEffect(() => {
@@ -45,7 +44,6 @@ const Chat = () => {
             })
             if (response) {
                 setMessageList(response.data.Message.message);
-                console.log(messageList[messageList.length]);
             }
             else {
                 setMessageList([]);
@@ -147,6 +145,10 @@ const Chat = () => {
 
     useEffect(() => {
         scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+        if (messageList && messageList.length > 0) {
+            const lastobj = messageList[messageList.length - 1];
+            setLastMessage(lastobj.message);
+        }
     }, [messageList])
 
     const createGroup = async () => {
@@ -173,7 +175,6 @@ const Chat = () => {
             username: user,
             group: groupe
         })
-        console.log(response);
 
         document.querySelector('.search-nav').classList.toggle('active-nav');
         document.querySelector('.notification').classList.toggle('not-act');
@@ -188,8 +189,16 @@ const Chat = () => {
             group: group,
             response: condition
         })
-        console.log(response);
         document.querySelector('.request-tab').classList.toggle('active-tab')
+    }
+
+    const leaveGroup = async () => {
+        document.querySelector('.options').classList.toggle('act');
+        const response = await axios.post("http://127.0.0.1:8000/exitgroup",{
+            group: groupName,
+            username: user
+        });
+        console.log(response);
     }
 
 
@@ -213,7 +222,7 @@ const Chat = () => {
                                 <img src={img} />
                                 <div className="txt">
                                     <h1 className='chat-name'>{element.Group}</h1>
-                                    <p>{}</p>
+                                    {groupName == element.Group && <p>{lastMessage}</p>}
                                 </div>
                             </li>
                         ))}
@@ -231,10 +240,14 @@ const Chat = () => {
                         {groupName && <button><i class="fa-solid fa-phone"></i></button>}
                         <button onClick={() => document.querySelector('.request-tab').classList.toggle('active-tab')}><i class="fa-solid fa-envelope"></i> <span>{requestList.length}</span></button>
                         <button onClick={() => document.querySelector('.search-nav').classList.toggle('active-nav')}><i class="fa-solid fa-magnifying-glass"></i></button>
+                        <button onClick={() => document.querySelector('.options').classList.toggle('act')}><i class="fa-solid fa-ellipsis-vertical"></i></button>
                     </div>
 
                 </div>
                 <div className="center-bottom">
+                    <div className="options">
+                         <p onClick={leaveGroup}>Delete Group</p>
+                    </div>
                     <ul ref={scrollRef}>
                         {messageList.map((element, key) => (
                             element.group ? <li key={key} style={{ maxWidth: '50%', height: 'fit-content', background: 'transparent', padding: 10, borderRadius: 10, borderWidth: 1, borderStyle: 'solid', borderColor: element.sender == user ? "#1db954" : 'white', color: 'white', listStyle: 'none', alignSelf: element.sender == user ? 'flex-end' : 'flex-start', marginLeft: element.sender == user ? 0 : 15, marginRight: element.sender == user ? 15 : 0 }}>{element.message}                         <p>{element.sender}</p></li> : ''
@@ -285,7 +298,10 @@ const Chat = () => {
                     {requestList &&
                         requestList.map((element, key) => (
                             <li key={key}>
-                                <h1>{element.username}</h1>
+                                <div className="txt">
+                                    <h1>{element.username}</h1>
+                                    <p>{element.group}</p>
+                                </div>
                                 <button onClick={() => {
                                     reqCondition(element.username, "accept", element.group)
                                     setRequestList(prev => prev.filter(item => item != element))
