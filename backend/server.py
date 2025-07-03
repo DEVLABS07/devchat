@@ -36,7 +36,6 @@ collection3 = database["Assignments"]
 collection4 = database["Chats"]
 collection5 = database["Groups"]
 collection6 = database["Requests"]
-collection7 = database["Pinned-Messages"]
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
@@ -105,11 +104,7 @@ class reqCondition(BaseModel):
     username: str
     group: str
     response: str
-class pinned(BaseModel):
-    group: str
-    message: str    
-    username:str
-    
+
 @app.post('/req')
 async def save_req(data:req, request:Request):
     try:
@@ -387,25 +382,7 @@ async def get_membs(data:getChat, request:Request):
     except Exception as e:
         return {"Error": e}
     
-@app.post("/getpinned")
-async def get_pinned(data:getChat):
-    try:
-        response = await collection7.find({"group":data.group}).to_list(length=None)
-        for i in response:
-            i['_id'] = str(i['_id'])
-        return response    
-    except Exception as e:
-        return {"Error": e}
-    
-@app.post("/savepinned")
-async def savepinned(data:pinned):
-    try:
-        response = await collection7.insert_one({"username": data.username, "group": data.group, "message": data.message})
-        return {"message": "Saved Successfully"}  
-    except Exception as e:
-        return {"Error": e}
-    
-    
+
 clients = {}
 
 @app.websocket('/ws/{group}')
