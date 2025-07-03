@@ -54,10 +54,10 @@ html {
 
 .left-top img {
     display: block;
-    width: 50px;
+    width: 50%;
     height: 50px;
     border-radius: 50%;
-    object-fit: fill;
+    object-fit: cover;
     margin-left: 20px;
 }
 
@@ -68,9 +68,10 @@ html {
     background-color: transparent;
     color: #1db954;
     border-radius: 40px;
-    margin-left: 10px;
+    justify-self: flex-end;
     cursor: pointer;
     transition: .5s ease;
+    margin-left: 40px;
 }
 
 .left-top button:hover {
@@ -241,10 +242,24 @@ html {
 .center-bottom ul::-webkit-scrollbar {
     width: 1px;
 }
+.center-bottom ul li span{
+    color:white;
+    margin-left: 90%;
+    margin-bottom: 100px;
+    scale:0;
+    font-size: 0px;
+}
+.center-bottom ul li:hover span{
+    color:white;
+    margin-left: 90%;
+    margin-bottom: 100px;
+    scale:1;
+    font-size: 20px;
+}
 
 .center-bottom input {
     display: block;
-    width: 90%;
+    width: 85%;
     height: 50px;
     margin-bottom: 10px;
     border-radius: 20px;
@@ -278,10 +293,10 @@ html {
     color: #1db954;
     background-color: #1a1a1a;
     padding: 10px;
-    border-radius: 10px;
+    border-radius: 40px;
     position: fixed;
     bottom: 11.4%;
-    right: 24%;
+    right: 24.5%;
     z-index: 10;
     cursor: pointer;
     transition: .5s ease;
@@ -323,7 +338,7 @@ html {
     flex-direction: column;
 }
 
-.right-top button {
+.right-button{
     width: 35px;
     height: 35px;
     color: #1db954;
@@ -339,7 +354,7 @@ html {
     transition: .5s ease;
 }
 
-.right-top button:hover {
+.right-button:hover {
     background-color: #1db954;
     color: white;
 }
@@ -351,14 +366,21 @@ html {
     list-style: none;
     text-align: left;
     display: flex;
-    align-items: center;
     flex-direction: column;
     overflow: scroll;
     overflow-x: hidden;
     padding-bottom: 20px;
-    padding-top: 40px;
-    padding-left: 0px;
-    padding-right: 20px;
+    padding-top: 0px;
+    padding-left: 15px;
+    padding-right: 10px;
+}
+.right-top h1{
+    padding:0px;
+    color:white;
+    font-size:20px;
+    font-weight:400;
+    padding-left:20px;
+    margin-top:30px;
 }
 
 .right-top ul::-webkit-scrollbar {
@@ -384,7 +406,14 @@ html {
     background-color: #1a1a1a;
     border-radius: 10px;
     display: flex;
+    flex-direction: column;
     align-items: center;
+}
+.right-bottom h1{
+    color:white;
+    font-size: 13px;
+    text-align: center;
+    padding-top:10px;
 }
 
 .right-bottom ul {
@@ -392,24 +421,28 @@ html {
     height: 90%;
     display: flex;
     align-items: center;
-    justify-content: center;
     flex-direction: column;
     text-align: flex-start;
     overflow: scroll;
-    padding-top: 25px;
+    padding-top: 5px;
     padding-left: 10px;
     padding-right: 10px;
+    gap:10px;
+    cursor: pointer;
 }
 
 .right-bottom ul li {
     color: white;
     list-style: none;
     text-align: center;
-    line-height: 30px;
+    line-height:24px;
     margin-top: 10px;
+    border:1px solid #666161;
+    border-radius: 20px;
+    width:90%
 }
 
-.right-bottom ul li button {
+.right-bottom ul li button, .complete {
     width: 25px;
     height: 25px;
     border: 1px solid #1db954;
@@ -420,14 +453,14 @@ html {
     transition: .5s ease;
 }
 
-.right-bottom ul li button:hover {
+.right-bottom ul li button:hover, .complete:hover {
     background-color: #1db954;
     color: white;
 }
 
 .right-bottom ul li span {
     font-size: 12px;
-    color: #1db954;
+    color: #666161;
 }
 
 .search-nav {
@@ -626,7 +659,6 @@ html {
 
 .options {
     width: 10%;
-    height: 40%;
     background-color: transparent;
     backdrop-filter: blur(20px);
     border-radius: 20px;
@@ -641,22 +673,82 @@ html {
     text-align: center;
     align-items: center;
     gap: 20px;
+    padding-top: 20px;
+    padding-bottom: 20px;
 }
 
-.options p {
+.options p:nth-child(1) {
     color: white;
     cursor: pointer;
-    padding-top:20px;
+    border: 1px solid red;
+    padding: 10px;
+    border-radius: 10px;
+    text-align: center;
 }
-.options p:hover{
-    color: red;
+
+.options p:hover:nth-child(1) {
+    color: white;
+    background-color: red;
     transition: .5s ease;
 }
+
+.options p:nth-child(2) {
+    color: white;
+    cursor: pointer;
+    border: 1px solid #1db954;
+    padding: 10px;
+    border-radius: 10px;
+    text-align: center;
+}
+
+.options p:nth-child(2):hover {
+    background-color: #1db954;
+    color: white;
+    transition: .5s ease;
+}
+
+.options p:nth-child(2):hover span {
+    color:#1db954;
+    opacity: 1;
+    transition: .5s ease;
+}
+
+.options p:nth-child(2) span {
+    padding: 10px;
+    border-radius: 10px;
+    background-color: white;
+    position: absolute;
+    margin-top: 40px;
+    opacity: 0;
+    transition: .5s ease;
+    line-height: 30px;
+}
+
+.options p:nth-child(2) span {
+    font-size: 14px;
+}
+
 .act {
     opacity: 1;
     z-index: 10000;
 }
-
+.min-page{
+    width:100%;
+    height:100vh;
+    background-color: black;
+    align-items: center;
+    z-index: 6000;
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color:#1db954;
+    scale:0;
+    font-size: 15px;
+    text-align: center;
+    padding:0px;
+    margin:0px;
+}
 @media screen and (max-width:1150px) {
     .left-top h1 {
         font-size: 13px;
@@ -665,5 +757,17 @@ html {
     .left-top img {
         width: 30px;
         height: 30px;
+    }
+}
+@media screen and (max-width:900px) {
+    .min-page{
+        scale:1;
+        font-size: 18px;
+    }
+}
+
+@media screen and (max-width:400px) {
+    .min-page{
+        font-size: 13px;
     }
 }

@@ -1,4 +1,5 @@
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from fastapi import Request
 from fastapi.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
 from pydantic import BaseModel
@@ -8,11 +9,16 @@ import os
 from dotenv import load_dotenv
 import yagmail 
 from typing import List
+from jose import JWTError, jwt
+from datetime import datetime, timedelta
 
 load_dotenv()
 url = os.getenv("MONGO_URI")
 email = os.getenv("EMAIL")
 password = os.getenv("PASSWORD")
+secret = os.getenv("SECRET-KEY")
+algorithm = os.getenv("ALGORITHM")
+expiry = os.getenv("ACCESS_EXPIRY")
 
 app = FastAPI()
 app.add_middleware(CORSMiddleware,
@@ -29,8 +35,29 @@ collection1 = database["Otp"]
 collection3 = database["Assignments"]
 collection4 = database["Chats"]
 collection5 = database["Groups"]
-collection6 = database["Requests"] 
+collection6 = database["Requests"]
+collection7 = database["Pinned-Messages"]
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+
+def create_access_token(data: dict, expires_delta: timedelta | None = None):
+    to_encode = data.copy()
+    expire = datetime.utcnow() + (expires_delta or timedelta(minutes=15))
+    to_encode.update({"exp": expire})
+    encoded_jwt = jwt.encode(to_encode, secret, algorithm= algorithm)
+    return encoded_jwt
+
+def verify_token(token: str):
+    try:
+        payload = jwt.decode(token, secret, algorithms=[algorithm])
+        username: str = payload.get("sub")
+        if not username:
+            raise Exception("Username not found in token")
+        return username
+    except JWTError as e:
+        return {"error": f"Invalid token: {str(e)}"}
+    except Exception as e:
+        return {"error": str(e)}
 
 
 
@@ -47,6 +74,8 @@ class data(BaseModel):
 class assign(BaseModel):
     task: str
     person: str
+    group: str
+    
 class assignDel(BaseModel):
     task: str
 class Check(BaseModel):
@@ -76,18 +105,30 @@ class reqCondition(BaseModel):
     username: str
     group: str
     response: str
+class pinned(BaseModel):
+    group: str
+    message: str    
+    username:str
     
 @app.post('/req')
-async def save_req(data:req):
+async def save_req(data:req, request:Request):
     try:
+        json = request.headers.get("Authorization")
+        check = verify_token(json)
+        if not json or not check:
+            return {"ERROR": "Invalid JSON"} 
         response = await collection6.insert_one({ "username": data.username, "group": data.group })    
         return {"message" : "Request sent successfully"}
     except Exception as e:
         return {"Error": e}
     
 @app.post('/getreqs')
-async def get_reqs(data:User):
+async def get_reqs(data:User, request:Request):
     try:
+        json = request.headers.get("Authorization")
+        check = verify_token(json)
+        if not json or not check:
+            return {"ERROR": "Invalid JSON"} 
         response = await collection5.find({"Admin":data.usermail}).to_list(length=None)
         requests = []
         for i in response:
@@ -101,8 +142,12 @@ async def get_reqs(data:User):
 
 
 @app.post('/handreq')
-async def handle_request(data: reqCondition):
+async def handle_request(data: reqCondition, request:Request):
     try:
+        json = request.headers.get("Authorization")
+        check = verify_token(json)
+        if not json or not check:
+            return {"ERROR": "Invalid JSON"} 
         condition = data.response
         if condition == "reject":
             response = await collection6.delete_one({"username": data.username, "group": data.group})
@@ -118,8 +163,12 @@ async def handle_request(data: reqCondition):
         return {"Error": e}
     
 @app.post('/exitgroup')
-async def exitgroup(data:req):
+async def exitgroup(data:req, request:Request):
     try:
+        json = request.headers.get("Authorization")
+        check = verify_token(json)
+        if not json or not check:
+            return {"ERROR": "Invalid JSON"} 
         response = await collection5.find_one({"Group": data.group})
         members = response["Members"]
         if response["Admin"] == data.username:
@@ -158,10 +207,12 @@ async def login(user: Login):
     if not user_data:
         passworde = pwd_context.hash(user.password) 
         new_user = await collection.insert_one({"usermail": usermail, "password": passworde})
-        return {"message": "User created successfully."}
+        json = create_access_token(data={"sub": usermail})
+        return {"message": "User created successfully.", "token": json}
     else:
         if pwd_context.verify(password, user_data["password"]):
-            return {"message": "Login successful."}
+            json = create_access_token(data={"sub": usermail})
+            return {"message": "Login successful.", "token": json}
         else:
             return {"error": "Invalid password."}
          
@@ -212,17 +263,25 @@ async def new_password(user: Login):
         return {"message": "Password updated successfully."}
     
 @app.post("/saveassign")
-async def save_assign(data:assign):
+async def save_assign(data:assign, request:Request):
     try:
-        save_assign = await collection3.insert_one({"task": data.task, "person": data.person})
+        json = request.headers.get("Authorization")
+        check = verify_token(json)
+        if not json or not check:
+            return {"ERROR": "Invalid JSON"} 
+        save_assign = await collection3.insert_one({"task": data.task, "person": data.person, "group": data.group})
         return {"message": "Added Successfully"}
     except Exception as e:
         return {"Error": e}
     
-@app.get("/getassign")
-async def get_assign():
+@app.post("/getassign")
+async def get_assign(data:getChat, request:Request):
     try:
-        get_assign = await collection3.find({}).to_list(length=None)
+        json = request.headers.get("Authorization")
+        check = verify_token(json)
+        if not json or not check:
+            return {"ERROR": "Invalid JSON"} 
+        get_assign = await collection3.find({"group": data.group}).to_list(length=None)
         for doc in get_assign:
             doc["_id"] = str(doc["_id"])
         return {"message": get_assign}
@@ -230,16 +289,24 @@ async def get_assign():
         return {'Error':str(e)}
 
 @app.post("/deltask")
-async def del_assign(dela:assignDel):
+async def del_assign(dela:assignDel, request:Request):
     try:
+        json = request.headers.get("Authorization")
+        check = verify_token(json)
+        if not json or not check:
+            return {"ERROR": "Invalid JSON"}
         response = await collection3.delete_one({ "task":dela.task })
         return {"message": "Successfully Deleted"}
     except Exception as e:
         return {"message": str(e)}
 
 @app.post("/savechat")
-async def saveChat(chatdata:chat):
+async def saveChat(chatdata:chat, request:Request):
     try:
+        json = request.headers.get("Authorization")
+        check = verify_token(json)
+        if not json or not check:
+            return {"ERROR": "Invalid JSON"}
         exist = await collection4.find_one({"group": chatdata.group})
         if(exist):
             modifydata = await collection4.update_one({"group": chatdata.group}, {"$set":{ "message": [msg.dict() for msg in chatdata.messages], "group": chatdata.group}})
@@ -252,8 +319,12 @@ async def saveChat(chatdata:chat):
     
     
 @app.post("/getchat")
-async def getchat(data: getChat):
+async def getchat(data: getChat, request:Request):
     try:
+        json = request.headers.get("Authorization")
+        check = verify_token(json)
+        if not json or not check:
+            return {"ERROR": "Invalid JSON"}
         response = await collection4.find_one({"group": data.group})
         if response:
             response['_id'] = str(response['_id'])
@@ -262,8 +333,12 @@ async def getchat(data: getChat):
         return {"Error": e}
 
 @app.post("/newchat")
-async def newchat(data: newGroup):
+async def newchat(data: newGroup, request:Request):
     try:
+        json = request.headers.get("Authorization")
+        check = verify_token(json)
+        if not json or not check:
+            return {"ERROR": "Invalid JSON"}
         checkGroup = await collection5.find_one({"Group": data.group})
         if(checkGroup):
             return {"message": "Group Already Exists. Please Enter a different Group Name", "code": 123}
@@ -273,8 +348,12 @@ async def newchat(data: newGroup):
         return {"Error": e}
     
 @app.post("/getgroup")
-async def getchat(data: User):
+async def getchat(data: User, request:Request):
     try:
+        json = request.headers.get("Authorization")
+        check = verify_token(json)
+        if not json or not check:
+            return {"ERROR": "Invalid JSON"}
         response = await collection5.find({"Members": data.usermail}).to_list(length = None)
         if(response):
             for i in response:
@@ -284,13 +363,48 @@ async def getchat(data: User):
         return {"Error": e} 
     
 @app.get("/allgroups")
-async def getallchats():
+async def getallchats(request:Request):
+        json = request.headers.get("Authorization")
+        check = verify_token(json)
+        if not json or not check:
+            return {"ERROR": "Invalid JSON"}
         response = await collection5.find({}).to_list(length=None)
         if response:
             for i in response:
                 i['_id'] = str(i['_id'])
             return  {"Message": response}
 
+@app.post("/getMembers")
+async def get_membs(data:getChat, request:Request):
+    try:
+        json = request.headers.get("Authorization")
+        check = verify_token(json)
+        if not json or not check:
+            return {"ERROR": "Invalid JSON"}
+        response = await collection5.find_one({"Group": data.group})
+        response['_id'] = str(response['_id'])
+        return {"message": response}
+    except Exception as e:
+        return {"Error": e}
+    
+@app.post("/getpinned")
+async def get_pinned(data:getChat):
+    try:
+        response = await collection7.find({"group":data.group}).to_list(length=None)
+        for i in response:
+            i['_id'] = str(i['_id'])
+        return response    
+    except Exception as e:
+        return {"Error": e}
+    
+@app.post("/savepinned")
+async def savepinned(data:pinned):
+    try:
+        response = await collection7.insert_one({"username": data.username, "group": data.group, "message": data.message})
+        return {"message": "Saved Successfully"}  
+    except Exception as e:
+        return {"Error": e}
+    
     
 clients = {}
 

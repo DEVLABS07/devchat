@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import './App.css'
-import logo from './assets/logo.jpg'
+import logo from './assets/logo2.jpg'
 import axios from 'axios'
 import './login.css'
 import { useState } from 'react';
@@ -23,13 +23,13 @@ function Login() {
         const usermail = document.querySelector('.email').value;
         const password = document.querySelector('.password').value;
         if (!usermail.trim() || !password.trim()) {
-            if(!usermail.trim()) {
-            const useremail = document.querySelector('.email');
-            useremail.style.border = '1px solid red';
+            if (!usermail.trim()) {
+                const useremail = document.querySelector('.email');
+                useremail.style.border = '1px solid red';
             }
-            if(!password.trim()) {
-            const userpassword = document.querySelector('.password');
-            userpassword.style.border = '1px solid red';
+            if (!password.trim()) {
+                const userpassword = document.querySelector('.password');
+                userpassword.style.border = '1px solid red';
             }
             return;
         }
@@ -38,12 +38,17 @@ function Login() {
                 usermail: usermail,
                 password: password
             })
-            console.log('Response:', response.data);
-            if(response.data.message == 'Login successful.'){
+            if (response.data.message == 'Login successful.') {
                 localStorage.setItem('user', usermail);
+                localStorage.setItem('token', response.data.token);
                 navigate('/chat');
             }
-            else{
+            else if (response.data.message == "User created successfully.") {
+                localStorage.setItem('user', usermail);
+                localStorage.setItem('token', response.data.token);
+                navigate('/chat');
+            }
+            else {
                 alert('Invalid Credentials');
             }
         }
@@ -69,7 +74,7 @@ function Login() {
                     <input className='password' type="password" placeholder="Password" autoComplete="off"
                         autoCorrect="off"
                         spellCheck="false" />
-                {login == 'Login'? <p onClick={() => navigate('/forgot')}>Forgot Password?</p>:''}   
+                    {login == 'Login' ? <p onClick={() => navigate('/forgot')}>Forgot Password?</p> : ''}
                     <button onClick={fetchData}>{login}</button>
                 </div>
             </div>

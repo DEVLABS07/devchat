@@ -1,6 +1,6 @@
 import { use, useEffect } from 'react'
 import './App.css'
-import logo from './assets/logo.jpg'
+import logo from './assets/logo2.jpg'
 import axios from 'axios'
 import { BrowserRouter as Router, useNavigate } from 'react-router-dom'
 import { Route, Routes } from 'react-router-dom'
@@ -11,6 +11,13 @@ import Chat from './Chat'
 
 function Lander() {
    const navigate = useNavigate();
+
+   useEffect(() => {
+      const json = localStorage.getItem("token");
+      if(json){
+         navigate('/chat');
+      }
+   },[])
    const fetchData = async () => {
       const userMail = document.querySelector('.email').value;
       if (!userMail.trim() || !userMail.includes('@')) {
