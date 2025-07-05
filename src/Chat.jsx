@@ -1,13 +1,15 @@
 import { use, useEffect, useRef, useState } from 'react'
 import './Chat.css'
 import img from './assets/dp02.jpg'
-import logo from './assets/logo2.jpg'
+import Logo from './assets/logo2.jpg'
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
+import { jwtDecode } from 'jwt-decode'
 
 const Chat = () => {
     const [user, setUser] = useState('');
     const [task, setTask] = useState([]);
+    const [groupChange, setgroupChange] = useState(false);
     const [requestList, setRequestList] = useState([]);
     const [Admin, setAdmin] = useState('');
     const [members, setMembers] = useState([]);
@@ -18,6 +20,7 @@ const Chat = () => {
     const [groupName, setGroupName] = useState();
     const [searchData, setSearchData] = useState([]);
     const [pinnedlist, setPinnedlist] = useState([]);
+    const [logo, setLogo] = useState();
     const [searchActivate, setSearchActivate] = useState(false);
     const scrollRef = useRef(null);
     const navigate = useNavigate();
@@ -26,6 +29,8 @@ const Chat = () => {
 
     useEffect(() => {
         const token = localStorage.getItem('token');
+        const parsedjwt = jwtDecode(token);
+        setUser(parsedjwt.sub);
         if (!token) {
             navigate('/login');
         }
@@ -46,82 +51,25 @@ const Chat = () => {
         }
         fetchGroups();
     }, [searchActivate])
-
-
     useEffect(() => {
         const username = localStorage.getItem('user');
         setUser(username);
         const ws = new WebSocket(`ws://127.0.0.1:8000/ws/${groupName}`);
         wsa.current = ws;
-        let remoteDescSet = false;
-        let pendingCandidates = [];
+
 
         wsa.current.onmessage = async (event) => {
             const parseddata = JSON.parse(event.data);
-            const pc = window.pc || new RTCPeerConnection();
+            if (!parseddata.message) return;
+            setMessageList(prev => [...prev, {
+                sender: parseddata.username,
+                message: parseddata.message,
+                key: 2,
+                group: parseddata.group
+            }]);
 
-            if (!window.pc) {
-                window.pc = pc;
-            }
-
-            if (parseddata.type === "offer") {
-                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                stream.getTracks().forEach(track => pc.addTrack(track, stream));
-
-                pc.onicecandidate = e => {
-                    if (e.candidate) {
-                        wsa.current.send(JSON.stringify({ type: "ice", candidate: e.candidate }));
-                    }
-                };
-
-                pc.ontrack = e => {
-                    const [remoteStream] = e.streams;
-                    const audio = new Audio();
-                    audio.srcObject = remoteStream;
-                    audio.play();
-                };
-
-                await pc.setRemoteDescription(new RTCSessionDescription(parseddata.offer));
-                remoteDescSet = true;
-
-                for (const candidate of pendingCandidates) {
-                    await pc.addIceCandidate(candidate);
-                }
-                pendingCandidates = [];
-
-                const answer = await pc.createAnswer();
-                await pc.setLocalDescription(answer);
-                wsa.current.send(JSON.stringify({ type: "answer", answer }));
-            }
-
-            else if (parseddata.type === "answer") {
-                await pc.setRemoteDescription(new RTCSessionDescription(parseddata.answer));
-                remoteDescSet = true;
-
-                for (const candidate of pendingCandidates) {
-                    await pc.addIceCandidate(candidate);
-                }
-                pendingCandidates = [];
-            }
-
-            else if (parseddata.type === "ice" && parseddata.candidate) {
-                const candidate = new RTCIceCandidate(parseddata.candidate);
-                if (remoteDescSet) {
-                    await pc.addIceCandidate(candidate);
-                } else {
-                    pendingCandidates.push(candidate);
-                }
-            }
-
-            else if (parseddata.message) {
-                setMessageList(prev => [...prev, {
-                    sender: parseddata.username,
-                    message: parseddata.message,
-                    key: 2,
-                    group: parseddata.group
-                }]);
-            }
         }
+
 
         const getMessages = async () => {
             setMessageList([]);
@@ -137,6 +85,7 @@ const Chat = () => {
             )
             if (response) {
                 setMessageList(response.data.Message.message);
+                setgroupChange(true);
             }
             else {
                 setMessageList([]);
@@ -181,12 +130,36 @@ const Chat = () => {
                 const response = await axios.post('http://127.0.0.1:8000/getpinned', {
                     group: groupName
                 })
-                setPinnedlist(response.data)
+                if (!response.data.message) {
+                    setPinnedlist([]);
+                    return
+                }
+                setPinnedlist(response.data.message)
             } catch (error) {
                 console.log(error);
             }
         }
         getpinned();
+
+        const getLogo = async () => {
+            const response = await axios.post('http://127.0.0.1:8000/logo', {
+                group: groupName
+            })
+            setLogo(response.data.Logo);
+        }
+        getLogo();
+
+
+        ws.onclose = () => {
+            console.log(`WebSocket closed for group: ${groupName}`);
+        };
+
+
+        return () => {
+            if (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING) {
+                ws.close();
+            }
+        };
 
     }, [groupName])
 
@@ -222,7 +195,6 @@ const Chat = () => {
     useEffect(() => {
         if (groupList.length > 0)
             setGroupName(groupList[0].Group)
-        console.log();
     }, [groupList])
 
     useEffect(() => {
@@ -240,7 +212,6 @@ const Chat = () => {
 
         const getReqs = async () => {
             if (user) {
-                console.log(user);
                 const response = await axios.post("http://127.0.0.1:8000/getreqs", {
                     usermail: user
                 }, {
@@ -264,6 +235,10 @@ const Chat = () => {
 
 
     useEffect(() => {
+        if (groupChange) {
+            setgroupChange(false);
+            return;
+        }
         const saveChat = async () => {
             if (messageList.length == 0) return;
             const response = await axios.post('http://127.0.0.1:8000/savechat', {
@@ -282,10 +257,9 @@ const Chat = () => {
     function appendArr() {
         const message = document.querySelector('.inputt').value;
         if (!message.trim()) return;
+        setMessageList(prev => [...prev, { sender: user, message: message, key: 3, group: groupName, type: 'msg' }]);
+        wsa.current.send(JSON.stringify({ message: message, username: user, group: groupName, type: message ? 'txt' : 'img' }));
         document.querySelector('.inputt').value = '';
-        setMessageList(prev => [...prev, { sender: user, message: message, key: 3, group: groupName }]);
-        const actualmess = JSON.stringify({ username: user, message: message, to: 'jram6269@gmail.com' });
-        wsa.current.send(JSON.stringify({ message: message, username: user, group: groupName }));
     }
 
     const addModule = async () => {
@@ -330,15 +304,80 @@ const Chat = () => {
         if (messageList && messageList.length > 0) {
             const lastobj = messageList[messageList.length - 1];
             setLastMessage(lastobj.message);
+        } else {
+            setLastMessage('');
         }
     }, [messageList])
 
 
+    const getImg = () => {
+        return new Promise((resolve) => {
+            const input = document.createElement("input");
+            input.type = "file";
+            input.accept = "image/*";
+
+            let resolved = false;
+
+            const cleanup = () => {
+                input.remove();
+                window.removeEventListener('focus', onFocus);
+            };
+
+            const onFocus = () => {
+                setTimeout(() => {
+                    if (!resolved) {
+                        resolved = true;
+                        cleanup();
+                        resolve(null);
+                    }
+                }, 10000);
+            };
+
+            input.onchange = async (e) => {
+                const file = e.target.files[0];
+                if (!file) {
+                    if (!resolved) {
+                        resolved = true;
+                        cleanup();
+                        resolve(null);
+                    }
+                    return;
+                }
+
+                const formData = new FormData();
+                formData.append("file", file);
+
+                try {
+                    const res = await axios.post("http://localhost:8000/upload", formData);
+                    if (!resolved) {
+                        resolved = true;
+                        cleanup();
+                        resolve(res.data.url);
+                    }
+                } catch (err) {
+                    console.error("Upload failed", err);
+                    if (!resolved) {
+                        resolved = true;
+                        cleanup();
+                        resolve(null);
+                    }
+                }
+            };
+
+            window.addEventListener('focus', onFocus, { once: true });
+            input.click();
+        });
+    };
+
+
+
     const createGroup = async () => {
         const groupName = prompt("Enter the name for the Group");
+        const groupimg = await getImg();
         if (!groupName.trim()) return;
         const saveGroup = await axios.post('http://127.0.0.1:8000/newchat', {
             username: user,
+            logo: groupimg ? groupimg : 'null',
             group: groupName,
             member: [user]
         }, {
@@ -351,7 +390,7 @@ const Chat = () => {
             return;
         }
         else {
-            setGroupList(prev => [...prev, { Group: groupName }]);
+            setGroupList(prev => [...prev, { Group: groupName, Logo: groupimg }]);
         }
 
 
@@ -400,7 +439,6 @@ const Chat = () => {
                 Authorization: `${json}`
             }
         });
-        console.log(response);
     }
     const savepinned = async (user, message) => {
         try {
@@ -409,13 +447,44 @@ const Chat = () => {
                 message: message,
                 username: user
             })
-            setPinnedlist(prev => [{ message: message, username: user, group: groupName },...prev]);
+            setPinnedlist(prev => [{ message: message, username: user, group: groupName }, ...prev]);
         } catch (error) {
             console.error('Error', error);
         }
     }
 
+    const getSearch = async () => {
+        try {
+            const query = document.getElementById('searchinput').value;
+            if (!query.trim()) return;
+            const response = await axios.post('http://127.0.0.1:8000/searchgroup', {
+                query: query
+            })
+            if (response.data.results == 0) {
+                alert("No Groups are availabe with the Provided Name")
+            }
+            else {
+                setSearchData(response.data.results);
+            }
+        } catch (error) {
+            console.error("Error:", error);
+        }
+    }
 
+    const handleUpload = async (e) => {
+        const file = e.target.files[0];
+        const formData = new FormData();
+        formData.append("file", file);
+        const res = await axios.post("http://localhost:8000/upload", formData);
+        setMessageList(prev => [...prev, {
+            group: groupName,
+            sender: user,
+            message: `${res.data.url}`,
+            key: 3,
+            type: 'img'
+        }])
+        e.target.value = null;
+    };
 
 
 
@@ -426,14 +495,14 @@ const Chat = () => {
             </div>
             <div className="left-box">
                 <div className="left-top">
-                    <img src={logo} />
+                    <img src={Logo} />
                     <button onClick={createGroup}><i class="fa-solid fa-plus"></i></button>
                 </div>
                 <div className="left-bottom">
                     <ul>
                         {groupList ? groupList.map((element, key) => (
                             <li key={key} onClick={() => setGroupName(element.Group)} style={{ backgroundColor: groupName == element.Group ? '#383636' : '' }}>
-                                <img src={img} />
+                                <img src={element.Logo == 'null' ? Logo : element.Logo} />
                                 <div className="txt">
                                     <h1 className='chat-name'>{element.Group}</h1>
                                     {groupName == element.Group && <p>{lastMessage}</p>}
@@ -446,7 +515,7 @@ const Chat = () => {
             <div className="center-box">
                 <div className="center-top">
                     <div className="t-left">
-                        {groupName && <img src={img} />}
+                        {groupName && <img src={logo == 'null' ? Logo : logo} />}
                         <h1>{groupName}</h1>
                     </div>
                     <div className="t-right">
@@ -463,7 +532,7 @@ const Chat = () => {
                     </div>
                     <ul ref={scrollRef}>
                         {messageList.map((element, key) => (
-                            element.group ? <li key={key} style={{ maxWidth: '50%', height: 'fit-content', background: 'transparent', padding: 10, borderRadius: 10, borderWidth: 1, borderStyle: 'solid', borderColor: element.sender == user ? "#1db954" : 'white', color: 'white', listStyle: 'none', alignSelf: element.sender == user ? 'flex-end' : 'flex-start', marginLeft: element.sender == user ? 0 : 15, marginRight: element.sender == user ? 15 : 0 }}>{element.message}                         <p>{element.sender}</p><span onClick={() => savepinned(element.sender, element.message)}><i class="fa-solid fa-map-pin"></i></span></li> : ''
+                            element.group ? element.type == 'img' ? <img style={{ alignSelf: element.sender == user ? 'flex-end' : 'flex-start', marginLeft: element.sender == user ? 0 : 15, marginRight: element.sender == user ? 15 : 0, zIndex: 2000 }} src={element.message} id='img-chat'></img> : <li key={key} style={{ maxWidth: '50%', height: 'fit-content', background: 'transparent', padding: 10, borderRadius: 10, borderWidth: 1, borderStyle: 'solid', borderColor: element.sender == user ? "#1db954" : 'white', color: 'white', listStyle: 'none', alignSelf: element.sender == user ? 'flex-end' : 'flex-start', marginLeft: element.sender == user ? 0 : 15, marginRight: element.sender == user ? 15 : 0 }}>{element.message}                         <p>{element.sender}</p><span onClick={() => savepinned(element.sender, element.message)}><i class="fa-solid fa-map-pin"></i></span></li> : ''
                         ))}
                     </ul>
                     <div className="input-box">
@@ -473,7 +542,13 @@ const Chat = () => {
                             }
                         }}></input>}
                         {groupName && <button onClick={appendArr}><i class="fa-solid fa-paper-plane"></i></button>}
-                    </div>
+                        <label htmlFor="file-upload" className="custom-file-upload"><i class="fa-solid fa-file"></i></label>
+                        <input
+                            id="file-upload"
+                            type="file"
+                            onChange={handleUpload}
+                            style={{ display: "none" }}
+                        />                    </div>
                 </div>
             </div>
             <div className="right-box">
@@ -487,17 +562,21 @@ const Chat = () => {
                     </ul>
                 </div>
                 <div className="right-bottom">
-                 { groupName?<h1>Pinned Messages - {groupName}</h1>:null}
+                    {groupName ? <h1>Pinned Messages - {groupName}</h1> : null}
                     <ul>
                         {pinnedlist.map((element, key) => (
-                            <li key={key}>{element.message}<br/><span>{element.username}</span></li>
+                            <li key={key}>{element.message}<br /><span>{element.username}</span></li>
                         ))}
                     </ul>
                 </div>
             </div>
             <div className="search-nav">
                 <h1>Search New Groups</h1>
-                <input onChange={() => setSearchActivate(true)} placeholder="Enter your Group's name"></input>
+                <input id='searchinput' onChange={() => setSearchActivate(true)} placeholder="Enter your Group's name" onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                        getSearch();
+                    }
+                }}></input>
                 <ul>
                     {searchData.map((element, key) => (
                         <li key={key}>

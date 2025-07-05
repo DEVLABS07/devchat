@@ -11,6 +11,12 @@ import yagmail
 from typing import List
 from jose import JWTError, jwt
 from datetime import datetime, timedelta
+import cloudinary
+import cloudinary.uploader
+from cloudinary.utils import cloudinary_url
+from fastapi import FastAPI, UploadFile, File
+from fastapi.responses import JSONResponse
+
 
 load_dotenv()
 url = os.getenv("MONGO_URI")
@@ -36,7 +42,16 @@ collection3 = database["Assignments"]
 collection4 = database["Chats"]
 collection5 = database["Groups"]
 collection6 = database["Requests"]
+collection8 = database["Images"]
+collection7 = database["Pinned-Messages"]
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+cloudinary.config( 
+    cloud_name = "dtdiycwah", 
+    api_key = "721865535941263", 
+    api_secret = "M4x_KuO_9YZnMAcF5QtPKNNj8qE",
+    secure=True
+)
 
 
 def create_access_token(data: dict, expires_delta: timedelta | None = None):
@@ -85,6 +100,7 @@ class schema(BaseModel):
     sender: str
     message: str
     key: int
+    type: str
 class chat(BaseModel):
     group: str
     messages: List[schema]
@@ -94,6 +110,7 @@ class getChat(BaseModel):
 class newGroup(BaseModel):
     username: str
     group: str
+    logo: str
     member: List
 
 class req(BaseModel):
@@ -104,7 +121,14 @@ class reqCondition(BaseModel):
     username: str
     group: str
     response: str
-
+class pinned(BaseModel):
+    username: str
+    group:str
+    message: str    
+    
+class search(BaseModel):
+    query: str
+    
 @app.post('/req')
 async def save_req(data:req, request:Request):
     try:
@@ -308,6 +332,7 @@ async def saveChat(chatdata:chat, request:Request):
             return {"message": "Message Modified"}
         else:
             saveData = await collection4.insert_one({ "message": [msg.dict() for msg in chatdata.messages], "group": chatdata.group})
+            print(chatdata.messages)
             return {"message": "Messages Saved"}
     except Exception as e:
         return {"message": e}
@@ -337,7 +362,7 @@ async def newchat(data: newGroup, request:Request):
         checkGroup = await collection5.find_one({"Group": data.group})
         if(checkGroup):
             return {"message": "Group Already Exists. Please Enter a different Group Name", "code": 123}
-        response = await collection5.insert_one({"Group": data.group, "Admin": data.username, "Members" : data.member})
+        response = await collection5.insert_one({"Group": data.group, "Admin": data.username,"Logo": data.logo, "Members" : data.member})
         return {"message": "Group Created"}
     except Exception as e:
         return {"Error": e}
@@ -382,7 +407,61 @@ async def get_membs(data:getChat, request:Request):
     except Exception as e:
         return {"Error": e}
     
+@app.post("/getpinned")
+async def get_pinned(data:getChat):
+    try:
+        response = await collection7.find_one({"group":data.group})
+        response['_id'] = str(response['_id'])
+        return response    
+    except Exception as e:
+        return {"Error": e}
+    
+@app.post("/savepinned")
+async def savepinned(data:pinned):
+    try:
+        exist = await collection7.find_one({"group": data.group})
+        if(exist):
+            newList = exist['message']
+            newList.append({'username': data.username, "group": data.group, "message": data.message})
+            print(newList)
+            response = await collection7.update_one({"group": data.group},{"$set":{"message": newList}})
+        else:
+            response = await collection7.insert_one({"username": data.username, "group": data.group, "message": [{ "username": data.username, "group": data.group,"message": data.message}]})
+        return {"message": "Saved Successfully"}  
+    except Exception as e:
+        return {"Error": e}
+    
+@app.post("/searchgroup")
+async def search_group(data: search):
+    try:
+        input = data.query
+        result = await collection5.find({"Group": input}).to_list(length=None)
+        for doc in result:
+            doc["_id"] = str(doc["_id"])
+        return {"results": result}
+    except Exception as e:
+        return {"error":e }
 
+
+@app.post('/upload')
+async def upload_img(file: UploadFile = File(...)):
+    contents = await file.read()
+    with open(file.filename, "wb") as f:
+        f.write(contents)
+    result = cloudinary.uploader.upload(file.filename, public_id=file.filename)
+    await collection7.insert_one({"url": result["secure_url"]})
+    return JSONResponse({"url": result["secure_url"]})
+
+@app.post('/logo')
+async def get_logo(data:getChat):
+    try:
+        response = await collection5.find_one({"Group": data.group})
+        logo = response['Logo']
+        return {"Logo": logo}
+    except Exception as e:
+        return {"Error": e}
+    
+    
 clients = {}
 
 @app.websocket('/ws/{group}')
