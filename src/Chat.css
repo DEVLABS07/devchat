@@ -95,9 +95,11 @@ html {
     list-style: none;
     gap: 20px;
 }
-.left-bottom ul::-webkit-scrollbar{
-    width:0px;
+
+.left-bottom ul::-webkit-scrollbar {
+    width: 0px;
 }
+
 .left-bottom ul li {
     width: 90%;
     padding: 5px;
@@ -243,18 +245,20 @@ html {
 .center-bottom ul::-webkit-scrollbar {
     width: 1px;
 }
-.center-bottom ul li span{
-    color:white;
+
+.center-bottom ul li span {
+    color: white;
     margin-left: 90%;
     margin-bottom: 100px;
-    scale:0;
+    scale: 0;
     font-size: 0px;
 }
-.center-bottom ul li:hover span{
-    color:white;
+
+.center-bottom ul li:hover span {
+    color: white;
     margin-left: 90%;
     margin-bottom: 100px;
-    scale:1;
+    scale: 1;
     font-size: 20px;
 }
 
@@ -339,7 +343,7 @@ html {
     flex-direction: column;
 }
 
-.right-button{
+.right-button {
     width: 35px;
     height: 35px;
     color: #1db954;
@@ -375,13 +379,14 @@ html {
     padding-left: 15px;
     padding-right: 10px;
 }
-.right-top h1{
-    padding:0px;
-    color:white;
-    font-size:20px;
-    font-weight:400;
-    padding-left:20px;
-    margin-top:30px;
+
+.right-top h1 {
+    padding: 0px;
+    color: white;
+    font-size: 20px;
+    font-weight: 600;
+    padding-left: 20px;
+    margin-top: 30px;
 }
 
 .right-top ul::-webkit-scrollbar {
@@ -410,11 +415,12 @@ html {
     flex-direction: column;
     align-items: center;
 }
-.right-bottom h1{
-    color:white;
+
+.right-bottom h1 {
+    color: white;
     font-size: 13px;
     text-align: center;
-    padding-top:10px;
+    padding-top: 10px;
 }
 
 .right-bottom ul {
@@ -428,7 +434,7 @@ html {
     padding-top: 5px;
     padding-left: 10px;
     padding-right: 10px;
-    gap:10px;
+    gap: 10px;
     cursor: pointer;
 }
 
@@ -436,14 +442,15 @@ html {
     color: white;
     list-style: none;
     text-align: center;
-    line-height:24px;
+    line-height: 24px;
     margin-top: 10px;
-    border:1px solid #666161;
+    border: 1px solid #666161;
     border-radius: 20px;
-    width:90%
+    width: 90%
 }
 
-.right-bottom ul li button, .complete {
+.right-bottom ul li button,
+.complete {
     width: 25px;
     height: 25px;
     border: 1px solid #1db954;
@@ -454,7 +461,8 @@ html {
     transition: .5s ease;
 }
 
-.right-bottom ul li button:hover, .complete:hover {
+.right-bottom ul li button:hover,
+.complete:hover {
     background-color: #1db954;
     color: white;
 }
@@ -709,7 +717,7 @@ html {
 }
 
 .options p:nth-child(2):hover span {
-    color:black;
+    color: black;
     opacity: 1;
     transition: .5s ease;
 }
@@ -733,9 +741,10 @@ html {
     opacity: 1;
     z-index: 10000;
 }
-.min-page{
-    width:100%;
-    height:100vh;
+
+.min-page {
+    width: 100%;
+    height: 100vh;
     background-color: black;
     align-items: center;
     z-index: 6000;
@@ -743,21 +752,23 @@ html {
     display: flex;
     align-items: center;
     justify-content: center;
-    color:#1db954;
-    scale:0;
+    color: #1db954;
+    scale: 0;
     font-size: 15px;
     text-align: center;
-    padding:0px;
-    margin:0px;
+    padding: 0px;
+    margin: 0px;
 }
-.img-input{
-    width:20px;
+
+.img-input {
+    width: 20px;
 }
-.custom-file-upload{
-    margin:0px;
-    border:1px solid #1db954;
-    padding:8px 13px;
-    color:#1db954;
+
+.custom-file-upload {
+    margin: 0px;
+    border: 1px solid #1db954;
+    padding: 8px 13px;
+    color: #1db954;
     border-radius: 50px;
     transition: .5s ease;
     z-index: 200000000;
@@ -766,18 +777,68 @@ html {
     position: fixed;
     cursor: pointer;
 }
-.custom-file-upload:hover{
+
+.custom-file-upload:hover {
     background-color: #1db954;
-    color:white;
+    color: white;
     transition: .5s ease;
 }
-#img-chat{
-    width:30%;
-    height:50%;
+
+#img-chat {
+    width: 30%;
+    height: 50%;
     object-fit: cover;
     margin-left: 20px;
+    cursor: pointer;
     border-radius: 20px;
 }
+
+.img-view {
+    width: 50%;
+    height: 70%;
+    background-color: white;
+    position: absolute;
+    z-index: 290892390;
+    border: none;
+    border-radius: 20px;
+    transition: .5s ease;
+}
+
+.img-view img {
+    width: 100%;
+    height: 100%;
+    object-fit: fill;
+    border-radius: 20px;
+    border: none;
+}
+
+.img-view button {
+    border-radius: 40px;
+    position: absolute;
+    padding: 10px;
+    text-align: center;
+    padding-left: 12px;
+    padding-right: 12px;
+    background-color: transparent;
+    border: 1px solid #1db954;
+    color: #1db954;
+    right: 20px;
+    top: 20px;
+    transition: .5s ease;
+    cursor: pointer;
+}
+
+.img-view button:hover {
+    background-color: #1db954;
+    color: white;
+    transition: .5s ease;
+}
+
+
+
+
+
+
 
 
 
@@ -792,15 +853,88 @@ html {
         height: 30px;
     }
 }
+
 @media screen and (max-width:900px) {
-    .min-page{
-        scale:1;
+    .min-page {
+        scale: 1;
         font-size: 18px;
     }
 }
 
 @media screen and (max-width:400px) {
-    .min-page{
+    .min-page {
         font-size: 13px;
     }
+}
+
+.new-group {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: white;
+    width: 40%;
+    height: 40%;
+    border-radius: 20px;
+    transform: translateY(-500%);
+    z-index: 44040303;
+    transition: .5s ease;
+}
+
+.new-group h1 {
+    color: #1db954;
+    font-size: 25px;
+    padding-top: 20px;
+}
+
+.new-group input[type='text'] {
+    width: 80%;
+    height: 15%;
+    border: 1px solid black;
+    background-color: white;
+    border-radius: 20px;
+    padding-left: 10px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin-top: 20px;
+    outline: none;
+}
+
+.new-group input:active {
+    border: 1px solid black;
+}
+
+.new-group input[type="file"] {
+    margin-top: 20px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.new-group input[type="file"]::file-selector-button {
+    padding: 10px;
+    background-color: #1db954;
+    border: 0px;
+    color: white;
+    border-radius: 20px;
+    cursor: pointer;
+}
+
+.new-group button {
+    margin-top: 30px;
+    padding: 10px;
+    background-color: transparent;
+    border: 1px solid #1db954;
+    width: 70%;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: .5s ease;
+}
+
+.new-group button:hover {
+    background-color: #1db954;
+    color: white;
+    transition: .5s ease;
+}
+
+.slide-bottom {
+    transform: translateY(0%);
+    transition: .5s ease;
 }

@@ -25,6 +25,9 @@ password = os.getenv("PASSWORD")
 secret = os.getenv("SECRET-KEY")
 algorithm = os.getenv("ALGORITHM")
 expiry = os.getenv("ACCESS_EXPIRY")
+name = os.getenv("CLOUD_NAME")
+apikey = os.getenv("API_KEY")
+api_secrett = os.getenv("API_SECRET")
 
 app = FastAPI()
 app.add_middleware(CORSMiddleware,
@@ -47,9 +50,9 @@ collection7 = database["Pinned-Messages"]
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 cloudinary.config( 
-    cloud_name = "dtdiycwah", 
-    api_key = "721865535941263", 
-    api_secret = "M4x_KuO_9YZnMAcF5QtPKNNj8qE",
+    cloud_name = name, 
+    api_key = apikey, 
+    api_secret = api_secrett,
     secure=True
 )
 
@@ -332,7 +335,6 @@ async def saveChat(chatdata:chat, request:Request):
             return {"message": "Message Modified"}
         else:
             saveData = await collection4.insert_one({ "message": [msg.dict() for msg in chatdata.messages], "group": chatdata.group})
-            print(chatdata.messages)
             return {"message": "Messages Saved"}
     except Exception as e:
         return {"message": e}
@@ -408,22 +410,29 @@ async def get_membs(data:getChat, request:Request):
         return {"Error": e}
     
 @app.post("/getpinned")
-async def get_pinned(data:getChat):
-    try:
+async def get_pinned(data:getChat, request:Request):
+     json = request.headers.get("Authorization")
+     check = verify_token(json)
+     if not json or not check:
+            return {"ERROR": "Invalid JSON"}
+     try:
         response = await collection7.find_one({"group":data.group})
         response['_id'] = str(response['_id'])
         return response    
-    except Exception as e:
+     except Exception as e:
         return {"Error": e}
     
 @app.post("/savepinned")
-async def savepinned(data:pinned):
+async def savepinned(data:pinned, request:Request):
     try:
+        json = request.headers.get("Authorization")
+        check = verify_token(json)
+        if not json or not check:
+            return {"ERROR": "Invalid JSON"}
         exist = await collection7.find_one({"group": data.group})
         if(exist):
             newList = exist['message']
             newList.append({'username': data.username, "group": data.group, "message": data.message})
-            print(newList)
             response = await collection7.update_one({"group": data.group},{"$set":{"message": newList}})
         else:
             response = await collection7.insert_one({"username": data.username, "group": data.group, "message": [{ "username": data.username, "group": data.group,"message": data.message}]})
@@ -432,7 +441,12 @@ async def savepinned(data:pinned):
         return {"Error": e}
     
 @app.post("/searchgroup")
-async def search_group(data: search):
+async def search_group(data: search, request:Request):
+    json = request.headers.get("Authorization")
+    check = verify_token(json)
+    if not json or not check:
+            return {"ERROR": "Invalid JSON"}
+        
     try:
         input = data.query
         result = await collection5.find({"Group": input}).to_list(length=None)
@@ -444,7 +458,11 @@ async def search_group(data: search):
 
 
 @app.post('/upload')
-async def upload_img(file: UploadFile = File(...)):
+async def upload_img( request:Request, file: UploadFile = File(...)):
+    json = request.headers.get("Authorization")
+    check = verify_token(json)
+    if not json or not check:
+            return {"ERROR": "Invalid JSON"}
     contents = await file.read()
     with open(file.filename, "wb") as f:
         f.write(contents)
@@ -453,8 +471,12 @@ async def upload_img(file: UploadFile = File(...)):
     return JSONResponse({"url": result["secure_url"]})
 
 @app.post('/logo')
-async def get_logo(data:getChat):
+async def get_logo(data:getChat, request:Request):
     try:
+        json = request.headers.get("Authorization")
+        check = verify_token(json)
+        if not json or not check:
+            return {"ERROR": "Invalid JSON"}
         response = await collection5.find_one({"Group": data.group})
         logo = response['Logo']
         return {"Logo": logo}

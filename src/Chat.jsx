@@ -1,6 +1,5 @@
-import { use, useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import './Chat.css'
-import img from './assets/dp02.jpg'
 import Logo from './assets/logo2.jpg'
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
@@ -15,6 +14,8 @@ const Chat = () => {
     const [members, setMembers] = useState([]);
     const wsa = useRef(null);
     const [lastMessage, setLastMessage] = useState();
+    const [imgView, setImgView] = useState('');
+    const [activateimgView, setActivateImgView] = useState(false);
     const [messageList, setMessageList] = useState([]);
     const [groupList, setGroupList] = useState([]);
     const [groupName, setGroupName] = useState();
@@ -25,12 +26,14 @@ const Chat = () => {
     const scrollRef = useRef(null);
     const navigate = useNavigate();
     const json = localStorage.getItem('token');
+    const [img, setImg] = useState();
 
 
     useEffect(() => {
         const token = localStorage.getItem('token');
         const parsedjwt = jwtDecode(token);
         setUser(parsedjwt.sub);
+        console.log(parsedjwt.sub);
         if (!token) {
             navigate('/login');
         }
@@ -129,6 +132,10 @@ const Chat = () => {
             try {
                 const response = await axios.post('http://127.0.0.1:8000/getpinned', {
                     group: groupName
+                }, {
+                    headers: {
+                        Authorization: `${json}`
+                    }
                 })
                 if (!response.data.message) {
                     setPinnedlist([]);
@@ -144,15 +151,16 @@ const Chat = () => {
         const getLogo = async () => {
             const response = await axios.post('http://127.0.0.1:8000/logo', {
                 group: groupName
+            }, {
+                headers: {
+                    Authorization: `${json}`
+                }
             })
             setLogo(response.data.Logo);
         }
         getLogo();
 
 
-        ws.onclose = () => {
-            console.log(`WebSocket closed for group: ${groupName}`);
-        };
 
 
         return () => {
@@ -163,33 +171,6 @@ const Chat = () => {
 
     }, [groupName])
 
-
-    const callUser = async () => {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        const pc = new RTCPeerConnection();
-
-        stream.getTracks().forEach(track => pc.addTrack(track, stream));
-
-        pc.onicecandidate = e => {
-            if (e.candidate) {
-                wsa.current.send(JSON.stringify({ type: "ice", candidate: e.candidate }));
-            }
-        };
-
-        pc.ontrack = e => {
-            const [remoteStream] = e.streams;
-            const audio = new Audio();
-            audio.srcObject = remoteStream;
-            audio.play();
-        };
-
-        const offer = await pc.createOffer();
-        await pc.setLocalDescription(offer);
-
-        wsa.current.send(JSON.stringify({ type: "offer", offer }));
-
-        window.pc = pc;
-    };
 
 
     useEffect(() => {
@@ -206,6 +187,8 @@ const Chat = () => {
                     Authorization: `${json}`
                 }
             })
+            console.log(user);
+            console.log(response);
             setGroupList(response.data.message);
         }
         getGroups();
@@ -310,74 +293,19 @@ const Chat = () => {
     }, [messageList])
 
 
-    const getImg = () => {
-        return new Promise((resolve) => {
-            const input = document.createElement("input");
-            input.type = "file";
-            input.accept = "image/*";
 
-            let resolved = false;
 
-            const cleanup = () => {
-                input.remove();
-                window.removeEventListener('focus', onFocus);
-            };
 
-            const onFocus = () => {
-                setTimeout(() => {
-                    if (!resolved) {
-                        resolved = true;
-                        cleanup();
-                        resolve(null);
-                    }
-                }, 10000);
-            };
-
-            input.onchange = async (e) => {
-                const file = e.target.files[0];
-                if (!file) {
-                    if (!resolved) {
-                        resolved = true;
-                        cleanup();
-                        resolve(null);
-                    }
-                    return;
-                }
-
-                const formData = new FormData();
-                formData.append("file", file);
-
-                try {
-                    const res = await axios.post("http://localhost:8000/upload", formData);
-                    if (!resolved) {
-                        resolved = true;
-                        cleanup();
-                        resolve(res.data.url);
-                    }
-                } catch (err) {
-                    console.error("Upload failed", err);
-                    if (!resolved) {
-                        resolved = true;
-                        cleanup();
-                        resolve(null);
-                    }
-                }
-            };
-
-            window.addEventListener('focus', onFocus, { once: true });
-            input.click();
-        });
-    };
 
 
 
     const createGroup = async () => {
-        const groupName = prompt("Enter the name for the Group");
-        const groupimg = await getImg();
+        document.getElementById('group').classList.toggle('slide-bottom');
+        const groupName = document.getElementById('groupname').value;
         if (!groupName.trim()) return;
         const saveGroup = await axios.post('http://127.0.0.1:8000/newchat', {
             username: user,
-            logo: groupimg ? groupimg : 'null',
+            logo: img ? img : 'null',
             group: groupName,
             member: [user]
         }, {
@@ -390,10 +318,8 @@ const Chat = () => {
             return;
         }
         else {
-            setGroupList(prev => [...prev, { Group: groupName, Logo: groupimg }]);
+            setGroupList(prev => [...prev, { Group: groupName, Logo: img }]);
         }
-
-
     }
 
     const handleRequest = async (groupe) => {
@@ -446,6 +372,10 @@ const Chat = () => {
                 group: groupName,
                 message: message,
                 username: user
+            }, {
+                headers: {
+                    Authorization: `${json}`
+                }
             })
             setPinnedlist(prev => [{ message: message, username: user, group: groupName }, ...prev]);
         } catch (error) {
@@ -459,6 +389,10 @@ const Chat = () => {
             if (!query.trim()) return;
             const response = await axios.post('http://127.0.0.1:8000/searchgroup', {
                 query: query
+            }, {
+                headers: {
+                    Authorization: `${json}`
+                }
             })
             if (response.data.results == 0) {
                 alert("No Groups are availabe with the Provided Name")
@@ -475,7 +409,11 @@ const Chat = () => {
         const file = e.target.files[0];
         const formData = new FormData();
         formData.append("file", file);
-        const res = await axios.post("http://localhost:8000/upload", formData);
+        const res = await axios.post("http://localhost:8000/upload", formData, {
+            headers: {
+                Authorization: `${json}`
+            }
+        });
         setMessageList(prev => [...prev, {
             group: groupName,
             sender: user,
@@ -486,17 +424,52 @@ const Chat = () => {
         e.target.value = null;
     };
 
+    const handleUploadimg = async (e) => {
+        const file = e.target.files[0];
+        try {
+            if (!file) {
+                setImg(null);
+                return;
+            }
+            const formData = new FormData();
+            formData.append("file", file);
+            const res = await axios.post("http://localhost:8000/upload", formData, {
+                headers: {
+                    Authorization: `${json}`
+                }
+            });
+            setImg(res.data.url);
 
+        } catch (err) {
+            console.error("Upload failed", err);
+        }
+    }
+
+    const handleImgView = (a) => {
+        setImgView(a);
+        setActivateImgView(true);
+    }
 
     return (
         <div className='parent-container'>
             <div className="notification">
                 <h1>Request Sent!</h1>
             </div>
+            {activateimgView && <div className="img-view"><button onClick={() => setActivateImgView(false)}><i class="fa-solid fa-xmark"></i></button><img src={imgView}></img></div> }
+            <div className="new-group" id='group'>
+                <h1>Name of the Group</h1>
+                <input id='groupname' placeholder="Enter your Group's Name" type='text'></input>
+                <input
+                    id="img-upload"
+                    type="file"
+                    onChange={handleUploadimg}
+                />
+                <button onClick={createGroup}>Create Group</button>
+            </div>
             <div className="left-box">
                 <div className="left-top">
                     <img src={Logo} />
-                    <button onClick={createGroup}><i class="fa-solid fa-plus"></i></button>
+                    <button onClick={() => document.getElementById('group').classList.toggle('slide-bottom')}><i class="fa-solid fa-plus"></i></button>
                 </div>
                 <div className="left-bottom">
                     <ul>
@@ -519,7 +492,6 @@ const Chat = () => {
                         <h1>{groupName}</h1>
                     </div>
                     <div className="t-right">
-                        {groupName && <button onClick={callUser}><i class="fa-solid fa-phone"></i></button>}
                         <button onClick={() => document.querySelector('.request-tab').classList.toggle('active-tab')}><i class="fa-solid fa-envelope"></i> <span>{requestList.length}</span></button>
                         <button onClick={() => document.querySelector('.search-nav').classList.toggle('active-nav')}><i class="fa-solid fa-magnifying-glass"></i></button>
                         {groupName && <button onClick={() => document.querySelector('.options').classList.toggle('act')}><i class="fa-solid fa-ellipsis-vertical"></i></button>}                       </div>
@@ -532,7 +504,7 @@ const Chat = () => {
                     </div>
                     <ul ref={scrollRef}>
                         {messageList.map((element, key) => (
-                            element.group ? element.type == 'img' ? <img style={{ alignSelf: element.sender == user ? 'flex-end' : 'flex-start', marginLeft: element.sender == user ? 0 : 15, marginRight: element.sender == user ? 15 : 0, zIndex: 2000 }} src={element.message} id='img-chat'></img> : <li key={key} style={{ maxWidth: '50%', height: 'fit-content', background: 'transparent', padding: 10, borderRadius: 10, borderWidth: 1, borderStyle: 'solid', borderColor: element.sender == user ? "#1db954" : 'white', color: 'white', listStyle: 'none', alignSelf: element.sender == user ? 'flex-end' : 'flex-start', marginLeft: element.sender == user ? 0 : 15, marginRight: element.sender == user ? 15 : 0 }}>{element.message}                         <p>{element.sender}</p><span onClick={() => savepinned(element.sender, element.message)}><i class="fa-solid fa-map-pin"></i></span></li> : ''
+                            element.group ? element.type == 'img' ? <img onClick={() => handleImgView(element.message)} style={{ alignSelf: element.sender == user ? 'flex-end' : 'flex-start', marginLeft: element.sender == user ? 0 : 15, marginRight: element.sender == user ? 15 : 0, zIndex: 2000 }} src={element.message} id='img-chat'></img> : <li key={key} style={{ maxWidth: '50%', height: 'fit-content', background: 'transparent', padding: 10, borderRadius: 10, borderWidth: 1, borderStyle: 'solid', borderColor: element.sender == user ? "#1db954" : 'white', color: 'white', listStyle: 'none', alignSelf: element.sender == user ? 'flex-end' : 'flex-start', marginLeft: element.sender == user ? 0 : 15, marginRight: element.sender == user ? 15 : 0 }}>{element.message}                         <p>{element.sender}</p><span onClick={() => savepinned(element.sender, element.message)}><i class="fa-solid fa-map-pin"></i></span></li> : ''
                         ))}
                     </ul>
                     <div className="input-box">
@@ -607,7 +579,6 @@ const Chat = () => {
                             </li>
                         ))
                     }
-
                 </ul>
             </div>
             <div className="min-page">
