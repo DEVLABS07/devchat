@@ -31,7 +31,7 @@ api_secrett = os.getenv("API_SECRET")
 
 app = FastAPI()
 app.add_middleware(CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["https://thumbsup07.netlify.app", "http://localhost:5173"],
     allow_credentials = True,
     allow_headers=["*"],
     allow_methods=["*"])
