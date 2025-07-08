@@ -42,7 +42,7 @@ const Chat = () => {
     useEffect(() => {
         const fetchGroups = async () => {
             if (searchActivate) {
-                const response = await axios.get("http://127.0.0.1:8000/allgroups",
+                const response = await axios.get("https://devchat-936f.onrender.com/allgroups",
                     {
                         headers: {
                             Authorization: `${json}`
@@ -57,7 +57,7 @@ const Chat = () => {
     useEffect(() => {
         const username = localStorage.getItem('user');
         setUser(username);
-        const ws = new WebSocket(`ws://127.0.0.1:8000/ws/${groupName}`);
+        const ws = new WebSocket(`https://devchat-936f.onrender.com/ws/${groupName}`);
         wsa.current = ws;
 
 
@@ -77,7 +77,7 @@ const Chat = () => {
         const getMessages = async () => {
             setMessageList([]);
             if (!groupName) return;
-            const response = await axios.post('http://127.0.0.1:8000/getchat', {
+            const response = await axios.post('https://devchat-936f.onrender.com/getchat', {
                 group: groupName
             },
                 {
@@ -98,7 +98,7 @@ const Chat = () => {
 
         const getMembers = async () => {
             if (!groupName) return;
-            const repsonse = await axios.post("http://127.0.0.1:8000/getMembers", {
+            const repsonse = await axios.post("https://devchat-936f.onrender.com/getMembers", {
                 group: groupName
             }, {
                 headers: {
@@ -114,7 +114,7 @@ const Chat = () => {
         const getTasks = async () => {
             try {
                 if (!groupName) return;
-                const response = await axios.post('http://127.0.0.1:8000/getassign', { group: groupName }, {
+                const response = await axios.post('https://devchat-936f.onrender.com/getassign', { group: groupName }, {
                     headers: {
                         Authorization: `${json}`
                     }
@@ -130,7 +130,7 @@ const Chat = () => {
 
         const getpinned = async () => {
             try {
-                const response = await axios.post('http://127.0.0.1:8000/getpinned', {
+                const response = await axios.post('https://devchat-936f.onrender.com/getpinned', {
                     group: groupName
                 }, {
                     headers: {
@@ -149,7 +149,7 @@ const Chat = () => {
         getpinned();
 
         const getLogo = async () => {
-            const response = await axios.post('http://127.0.0.1:8000/logo', {
+            const response = await axios.post('https://devchat-936f.onrender.com/logo', {
                 group: groupName
             }, {
                 headers: {
@@ -180,7 +180,7 @@ const Chat = () => {
 
     useEffect(() => {
         const getGroups = async () => {
-            const response = await axios.post("http://127.0.0.1:8000/getgroup", {
+            const response = await axios.post("https://devchat-936f.onrender.com/getgroup", {
                 usermail: user
             }, {
                 headers: {
@@ -195,7 +195,7 @@ const Chat = () => {
 
         const getReqs = async () => {
             if (user) {
-                const response = await axios.post("http://127.0.0.1:8000/getreqs", {
+                const response = await axios.post("https://devchat-936f.onrender.com/getreqs", {
                     usermail: user
                 }, {
                     headers: {
@@ -224,7 +224,7 @@ const Chat = () => {
         }
         const saveChat = async () => {
             if (messageList.length == 0) return;
-            const response = await axios.post('http://127.0.0.1:8000/savechat', {
+            const response = await axios.post('https://devchat-936f.onrender.com/savechat', {
                 group: groupName,
                 messages: messageList,
             }, {
@@ -251,7 +251,7 @@ const Chat = () => {
         if (!assignment.trim() || !person.trim()) return;
         setTask(prev => [...prev, { task: assignment, person: person }]);
         try {
-            const saveTask = await axios.post('http://127.0.0.1:8000/saveassign', {
+            const saveTask = await axios.post('https://devchat-936f.onrender.com/saveassign', {
                 task: assignment,
                 person: person,
                 group: groupName
@@ -268,7 +268,7 @@ const Chat = () => {
 
     const deltask = async (key, task) => {
         try {
-            const response = await axios.post('http://127.0.0.1:8000/deltask', {
+            const response = await axios.post('https://devchat-936f.onrender.com/deltask', {
                 task: task
             }, {
                 headers: {
@@ -303,7 +303,7 @@ const Chat = () => {
         document.getElementById('group').classList.toggle('slide-bottom');
         const groupName = document.getElementById('groupname').value;
         if (!groupName.trim()) return;
-        const saveGroup = await axios.post('http://127.0.0.1:8000/newchat', {
+        const saveGroup = await axios.post('https://devchat-936f.onrender.com/newchat', {
             username: user,
             logo: img ? img : 'null',
             group: groupName,
@@ -324,7 +324,7 @@ const Chat = () => {
 
     const handleRequest = async (groupe) => {
         const json = localStorage.getItem('token');
-        const response = await axios.post('http://127.0.0.1:8000/req', {
+        const response = await axios.post('https://devchat-936f.onrender.com/req', {
             username: user,
             group: groupe
         },
@@ -343,7 +343,7 @@ const Chat = () => {
     }
 
     const reqCondition = async (name, condition, group) => {
-        const response = await axios.post("http://127.0.0.1:8000/handreq", {
+        const response = await axios.post("https://devchat-936f.onrender.com/handreq", {
             username: name,
             group: group,
             response: condition
@@ -357,7 +357,7 @@ const Chat = () => {
 
     const leaveGroup = async () => {
         document.querySelector('.options').classList.toggle('act');
-        const response = await axios.post("http://127.0.0.1:8000/exitgroup", {
+        const response = await axios.post("https://devchat-936f.onrender.com/exitgroup", {
             group: groupName,
             username: user
         }, {
@@ -368,7 +368,7 @@ const Chat = () => {
     }
     const savepinned = async (user, message) => {
         try {
-            const response = await axios.post('http://127.0.0.1:8000/savepinned', {
+            const response = await axios.post('https://devchat-936f.onrender.com/savepinned', {
                 group: groupName,
                 message: message,
                 username: user
@@ -387,7 +387,7 @@ const Chat = () => {
         try {
             const query = document.getElementById('searchinput').value;
             if (!query.trim()) return;
-            const response = await axios.post('http://127.0.0.1:8000/searchgroup', {
+            const response = await axios.post('https://devchat-936f.onrender.com/searchgroup', {
                 query: query
             }, {
                 headers: {
@@ -409,7 +409,7 @@ const Chat = () => {
         const file = e.target.files[0];
         const formData = new FormData();
         formData.append("file", file);
-        const res = await axios.post("http://localhost:8000/upload", formData, {
+        const res = await axios.post("https://devchat-936f.onrender.com/upload", formData, {
             headers: {
                 Authorization: `${json}`
             }
@@ -433,7 +433,7 @@ const Chat = () => {
             }
             const formData = new FormData();
             formData.append("file", file);
-            const res = await axios.post("http://localhost:8000/upload", formData, {
+            const res = await axios.post("https://devchat-936f.onrender.com/upload", formData, {
                 headers: {
                     Authorization: `${json}`
                 }
@@ -514,7 +514,7 @@ const Chat = () => {
                             }
                         }}></input>}
                         {groupName && <button onClick={appendArr}><i class="fa-solid fa-paper-plane"></i></button>}
-                        <label htmlFor="file-upload" className="custom-file-upload"><i class="fa-solid fa-file"></i></label>
+                       {groupName && <label htmlFor="file-upload" className="custom-file-upload"><i class="fa-solid fa-file"></i></label> } 
                         <input
                             id="file-upload"
                             type="file"

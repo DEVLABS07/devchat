@@ -132,6 +132,11 @@ class pinned(BaseModel):
 class search(BaseModel):
     query: str
     
+@app.get('/health')
+async def health():
+    return {"message": "Healthy"}    
+    
+    
 @app.post('/req')
 async def save_req(data:req, request:Request):
     try:

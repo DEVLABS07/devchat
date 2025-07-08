@@ -28,7 +28,7 @@ function Lander() {
          return;
       }
       try {
-         const response = await axios.post('http://127.0.0.1:8000/user', {
+         const response = await axios.post('https://devchat-936f.onrender.com/user', {
             usermail: userMail,
          })
          console.log(response.data);

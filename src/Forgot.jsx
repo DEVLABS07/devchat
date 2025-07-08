@@ -28,7 +28,7 @@ const Forgot = () => {
         }
 
         try {
-            const response = await axios.post('http://127.0.0.1:8000/saveotp', { usermail: email });
+            const response = await axios.post('https://devchat-936f.onrender.com/saveotp', { usermail: email });
             alert(response.data.message);
             setOtp(response.data.otp);
         } catch (error) {
@@ -46,7 +46,7 @@ const Forgot = () => {
         }
         const email = document.querySelector('input[type="email"]').value;
         const enteredOtp = document.querySelector('.otp').value;
-        const getotp = await axios.post('http://127.0.0.1:8000/checkotp', {
+        const getotp = await axios.post('https://devchat-936f.onrender.com/checkotp', {
             username: email,
             otp: enteredOtp
         })
@@ -71,7 +71,7 @@ const Forgot = () => {
             alert("Please enter a new password.");
             return;
         }
-        const sendNewpass = await axios.post('http://127.0.0.1:8000/newpass', { usermail: usermail, password: newPassword });
+        const sendNewpass = await axios.post('https://devchat-936f.onrender.com/newpass', { usermail: usermail, password: newPassword });
         console.log("Response from server:", sendNewpass.data);
         if (sendNewpass.data.message == 'Password updated successfully.') {
             alert("Password changed successfully!");
