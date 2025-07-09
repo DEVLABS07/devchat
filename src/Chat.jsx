@@ -68,7 +68,8 @@ const Chat = () => {
                 sender: parseddata.username,
                 message: parseddata.message,
                 key: 2,
-                group: parseddata.group
+                group: parseddata.group,
+                type: parseddata.type
             }]);
 
         }
@@ -421,6 +422,7 @@ const Chat = () => {
             key: 3,
             type: 'img'
         }])
+        wsa.current.send(JSON.stringify({ message: res.data.url, username: user, group: groupName, type:'img' }));
         e.target.value = null;
     };
 
@@ -444,6 +446,7 @@ const Chat = () => {
             console.error("Upload failed", err);
         }
     }
+   
 
     const handleImgView = (a) => {
         setImgView(a);

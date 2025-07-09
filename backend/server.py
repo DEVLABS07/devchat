@@ -468,10 +468,7 @@ async def upload_img( request:Request, file: UploadFile = File(...)):
     check = verify_token(json)
     if not json or not check:
             return {"ERROR": "Invalid JSON"}
-    contents = await file.read()
-    with open(file.filename, "wb") as f:
-        f.write(contents)
-    result = cloudinary.uploader.upload(file.filename, public_id=file.filename)
+    result = cloudinary.uploader.upload(file.file, public_id=file.filename)
     await collection7.insert_one({"url": result["secure_url"]})
     return JSONResponse({"url": result["secure_url"]})
 
