@@ -420,7 +420,7 @@ const Chat = () => {
             key: 3,
             type: 'img'
         }])
-        wsa.current.send(JSON.stringify({ message: res.data.url, username: user, group: groupName, type:'img' }));
+        wsa.current.send(JSON.stringify({ message: res.data.url, username: user, group: groupName, type: 'img' }));
         e.target.value = null;
     };
 
@@ -444,7 +444,7 @@ const Chat = () => {
             console.error("Upload failed", err);
         }
     }
-   
+
 
     const handleImgView = (a) => {
         setImgView(a);
@@ -456,7 +456,7 @@ const Chat = () => {
             <div className="notification">
                 <h1>Request Sent!</h1>
             </div>
-            {activateimgView && <div className="img-view"><button onClick={() => setActivateImgView(false)}><i class="fa-solid fa-xmark"></i></button><img src={imgView}></img></div> }
+            {activateimgView && <div className="img-view"><button onClick={() => setActivateImgView(false)}><i class="fa-solid fa-xmark"></i></button><img src={imgView}></img></div>}
             <div className="new-group" id='group'>
                 <h1>Name of the Group</h1>
                 <input id='groupname' placeholder="Enter your Group's Name" type='text'></input>
@@ -493,15 +493,16 @@ const Chat = () => {
                         <h1>{groupName}</h1>
                     </div>
                     <div className="t-right">
-                        <button onClick={() => document.querySelector('.request-tab').classList.toggle('active-tab')}><i class="fa-solid fa-envelope"></i> <span>{requestList.length}</span></button>
+                        <button onClick={() => document.querySelector('.request-tab').classList.toggle('active-tab')}><i class="fa-solid fa-envelope"></i> <span className='mems'>{requestList.length}</span></button>
                         <button onClick={() => document.querySelector('.search-nav').classList.toggle('active-nav')}><i class="fa-solid fa-magnifying-glass"></i></button>
-                        {groupName && <button onClick={() => document.querySelector('.options').classList.toggle('act')}><i class="fa-solid fa-ellipsis-vertical"></i></button>}                       </div>
-
+                        {groupName && <button onClick={() => document.querySelector('.options').classList.toggle('act')}><i class="fa-solid fa-ellipsis-vertical"></i></button>}
+                        <button><i class="fa-solid fa-gear"></i></button>
+                    </div>
                 </div>
                 <div className="center-bottom">
                     <div className="options">
                         <p onClick={leaveGroup}>Delete Group</p>
-                        <p>Group Info <span>Admin {members.map(element => (`${element == Admin ? `\n${element}\n Members` : `\n${element}`}`))}</span></p>
+                        <p> <strong>Group Info</strong> {members.map(element => (<span>{`${element}`}</span>))}</p>
                     </div>
                     <ul ref={scrollRef}>
                         {messageList.map((element, key) => (
@@ -515,7 +516,7 @@ const Chat = () => {
                             }
                         }}></input>}
                         {groupName && <button onClick={appendArr}><i class="fa-solid fa-paper-plane"></i></button>}
-                       {groupName && <label htmlFor="file-upload" className="custom-file-upload"><i class="fa-solid fa-file"></i></label> } 
+                        {groupName && <label htmlFor="file-upload" className="custom-file-upload"><i class="fa-solid fa-file"></i></label>}
                         <input
                             id="file-upload"
                             type="file"
@@ -582,9 +583,7 @@ const Chat = () => {
                     }
                 </ul>
             </div>
-            <div className="min-page">
-                <h1>Oh Unfortunately, ThumbsUp is not available for Mobiles yet.</h1>
-            </div>
+
         </div >
 
     )
