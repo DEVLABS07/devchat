@@ -1,9 +1,33 @@
-.login-box-bottom p{
+.login-box-bottom p {
     padding-left: 15px;
-    text-decoration: underline;
-    cursor: pointer;
-}
-.login-box-bottom p:hover{
-    padding-left: 15px;
+    font-size: 0.9rem;
+    color: var(--text-dim); /* Uses the slate color from the previous variables */
     text-decoration: none;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    letter-spacing: 0.3px;
+}
+
+.login-box-bottom p:hover {
+    color: var(--secondary); /* Electric Cyan */
+    padding-left: 22px; /* Smoothly pushes the text to the right */
+    letter-spacing: 1px;
+    text-shadow: 0 0 8px var(--secondary); /* Soft glow effect */
+}
+
+/* Optional: Add a small animated dash before the text on hover */
+.login-box-bottom p::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    width: 0;
+    height: 1px;
+    background: var(--secondary);
+    transition: width 0.3s ease;
+}
+
+.login-box-bottom p:hover::before {
+    width: 12px;
 }

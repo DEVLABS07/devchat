@@ -55,8 +55,6 @@ const Chat = () => {
         fetchGroups();
     }, [searchActivate])
     useEffect(() => {
-        const username = localStorage.getItem('user');
-        setUser(username);
         const ws = new WebSocket(`https://devchat-936f.onrender.com/ws/${groupName}`);
         wsa.current = ws;
 

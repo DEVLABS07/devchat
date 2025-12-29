@@ -1,194 +1,173 @@
-@import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;800&display=swap');
+
+:root {
+    --bg-dark: #0a0a0c;
+    --card-bg: rgba(255, 255, 255, 0.03);
+    --accent: #7c4dff; /* Electric Violet */
+    --accent-glow: rgba(124, 77, 255, 0.4);
+    --secondary: #00e5ff; /* Cyan */
+    --text-main: #ffffff;
+    --text-dim: #94a3b8;
+    --glass-border: rgba(255, 255, 255, 0.1);
+}
 
 * {
     margin: 0;
     padding: 0;
+    box-sizing: border-box;
 }
 
 .main-page {
     width: 100%;
     height: 100vh;
-    background-color: #121212;
+    background: radial-gradient(circle at center, #1a1a2e 0%, #0a0a0c 100%);
     display: flex;
-    flex-direction: column;
     align-items: center;
-    font-family: 'Nunito';
     justify-content: center;
+    font-family: 'Nunito', sans-serif;
 }
 
 .login-box {
-    width: 50%;
-    height: 80%;
+    width: 400px; /* More standard login width */
+    height: auto;
+    min-height: 600px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    align-content: center;
-    background-color: #1f1f1f;
-    padding:40px 0;
-    border-radius: 20px;
+    background: var(--card-bg);
+    backdrop-filter: blur(20px);
+    padding: 50px 30px;
+    border-radius: 24px;
+    border: 1px solid var(--glass-border);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+
+.login-box img {
+    width: 60px;
+    height: auto;
+    margin-bottom: 20px;
+    filter: drop-shadow(0 0 10px var(--accent-glow));
 }
 
 .login-box h1 {
-    color: white;
-    font-size: 30px;
-    font-weight: 700;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    text-align: center;
-    padding-top: 10px;
+    color: var(--text-main);
+    font-size: 28px;
+    font-weight: 800;
+    margin-bottom: 30px;
+    letter-spacing: -0.5px;
 }
-.login-box-bottom {
-    padding:0;
+
+/* --- Top Section (OAuth/Social Buttons) --- */
+.login-box-top {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .login-box-top button {
-    width: 50%;
-    height: 50px;
-    background-color: transparent;
-    border: 1px solid #878787;
-    color: #c0b8b8;
-    border-radius: 40px;
-    font-family: 'Nunito';
-    font-size: 17px;
-    font-weight: 700;
-    margin-top: 20px;
+    width: 100%;
+    height: 48px;
+    background: transparent;
+    border: 1px solid var(--glass-border);
+    color: var(--text-main);
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 12px;
     cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
 }
 
 .login-box-top button:hover {
-    border: 1px solid white;
-    color:white;
+    background: rgba(255, 255, 255, 0.05);
+    border-color: var(--text-main);
+}
+
+.login-box-top hr {
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--glass-border), transparent);
+    border: none;
+    margin: 30px 0;
+}
+
+/* --- Bottom Section (Form) --- */
+.login-box-bottom {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .login-box-bottom input {
-    width: 80%;
-    height: 45px;
-    font-size: 16px;
-    border: 1px solid #878787;
-    background-color: transparent;
-    padding: 0 20px;
-    font-family: 'Nunito';
-    margin-top: 30px;
+    width: 100%;
+    height: 50px;
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    padding: 0 16px;
     color: white;
-    border-radius: 5px;
+    font-family: 'Nunito';
+    font-size: 15px;
+    margin-bottom: 15px;
+    transition: all 0.3s ease;
 }
 
 .login-box-bottom input:focus {
     outline: none;
-    border-color: white;
+    border-color: var(--accent);
+    background: rgba(0, 0, 0, 0.4);
+    box-shadow: 0 0 0 4px var(--accent-glow);
 }
 
-
 .login-box-bottom button {
-    width: 80%;
+    width: 100%;
     height: 50px;
-    background-color: #1ed760;
+    background: var(--accent);
+    color: white;
     border: none;
-    border-radius: 40px;
-    bottom: 30px;
-    font-family: 'Nunito';
-    font-size: 17px;
+    border-radius: 12px;
+    font-size: 16px;
     font-weight: 700;
-    margin-top: 20px;
+    margin-top: 10px;
     cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px var(--accent-glow);
 }
 
 .login-box-bottom button:hover {
-    scale: 1.05;
-    background-color: #42cf73;
-}
-.login-box-top {
-    width: 100%;
-    height: 50%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-.login-box-top hr{
-    width: 60%;
-    height:1px;
-    background-color: #878787;
-    border: none;
-    margin-top: 50px;
+    transform: translateY(-2px);
+    filter: brightness(1.1);
+    box-shadow: 0 8px 25px var(--accent-glow);
 }
 
-.login-box-bottom {
-    width: 100%;
-    height: 50%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
-}
-.login-box-bottom h1{
-    margin:0px;
-    padding:0px;
-}
 .login-box-bottom p {
-    color: #878787;
-    font-size: 14px;
-    font-family: 'Nunito';
-    margin-top: 10px;
-    align-self: flex-start;
-    margin-left:7%;
-}
-.login-box img {
-    width: 50px;
-    height: 50px;
-    align-self: center;
-    margin: 0px;
-    padding: 0px;
-    justify-self: center;
-    position: relative;
-    display: block;
+    color: var(--text-dim);
+    font-size: 13px;
+    margin-top: 15px;
+    cursor: pointer;
+    transition: 0.3s;
+    align-self: center; /* Centered looks cleaner in glassmorphism */
 }
 
+.login-box-bottom p:hover {
+    color: var(--secondary);
+    text-shadow: 0 0 8px var(--secondary);
+}
 
-@media screen and (max-width: 768px) {
-    .main-page {
-        width: 100%;
-        height: 100vh;
-    }
+/* --- Responsive Layout --- */
+@media screen and (max-width: 480px) {
     .login-box {
-        width: 70%;
-        height: 80%;
-    }
-    .login-box h1 {
-        font-size: 24px;
-    }
-    .login-box-top button, .login-box-bottom button {
-        width: 80%;
-    }
-    .login-box-bottom input {
-        width: 70%;
-    }
-    .login-box-bottom p {
-        font-size: 12px;
-        margin-left: 5%;
+        width: 90%;
+        padding: 40px 20px;
     }
     
-}
-@media screen and (max-width: 500px) {
-    .main-page {
-        width: 100%;
-        height: 100vh;
-    }
-    .login-box {
-        width: 80%;
-        height: 80%;
-    }
     .login-box h1 {
-        font-size: 24px;
+        font-size: 22px;
     }
-    .login-box-top button, .login-box-bottom button {
-        width: 80%;
-    }
-    .login-box-bottom input {
-        width: 70%;
-    }
-    .login-box-bottom p {
-        font-size: 12px;
-        margin-left: 5%;
-    }
-    
 }
-
