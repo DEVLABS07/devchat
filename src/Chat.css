@@ -16,7 +16,8 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: 'Outfit', sans-serif; /* Cleaner, more modern font */
+    font-family: 'Outfit', sans-serif;
+    /* Cleaner, more modern font */
     scrollbar-width: thin;
     scrollbar-color: #334155 transparent;
 }
@@ -34,7 +35,7 @@ body {
     display: flex;
     gap: 16px;
     padding: 16px;
-    background: 
+    background:
         radial-gradient(circle at 15% 50%, rgba(76, 29, 149, 0.15), transparent 25%),
         radial-gradient(circle at 85% 30%, rgba(6, 182, 212, 0.1), transparent 25%);
     background-color: #020203;
@@ -42,7 +43,9 @@ body {
 }
 
 /* --- SHARED PANEL STYLES --- */
-.left-box, .center-box, .right-box {
+.left-box,
+.center-box,
+.right-box {
     background: var(--glass-panel);
     backdrop-filter: blur(24px);
     -webkit-backdrop-filter: blur(24px);
@@ -67,14 +70,14 @@ body {
     align-items: center;
     justify-content: space-between;
     border-bottom: 1px solid var(--glass-border);
-    background: rgba(255,255,255,0.01);
+    background: rgba(255, 255, 255, 0.01);
 }
 
 .left-top img {
     width: 42px;
     height: 42px;
     border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 .left-top button {
@@ -82,7 +85,7 @@ body {
     height: 36px;
     border-radius: 10px;
     border: 1px solid var(--glass-border);
-    background: rgba(255,255,255,0.05);
+    background: rgba(255, 255, 255, 0.05);
     color: white;
     cursor: pointer;
     transition: 0.3s;
@@ -103,7 +106,9 @@ body {
     padding: 16px;
 }
 
-.left-bottom ul { list-style: none; }
+.left-bottom ul {
+    list-style: none;
+}
 
 .left-bottom li {
     padding: 14px;
@@ -118,8 +123,8 @@ body {
 }
 
 .left-bottom li:hover {
-    background: rgba(255,255,255,0.03);
-    border-color: rgba(255,255,255,0.1);
+    background: rgba(255, 255, 255, 0.03);
+    border-color: rgba(255, 255, 255, 0.1);
     transform: translateX(4px);
 }
 
@@ -165,26 +170,44 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: rgba(255,255,255,0.01);
+    background: rgba(255, 255, 255, 0.01);
 }
-.options p{
+
+.options p {
     display: flex;
     flex-direction: column;
 }
-.options p span{
-    padding: 5px;
-}
-.t-left { display: flex; align-items: center; gap: 16px; }
 
-.t-left img { 
-    width: 44px; height: 44px; 
-    border-radius: 14px; 
-    border: 2px solid rgba(168, 85, 247, 0.5); 
+.options p span {
+    opacity: 0;
+    scale: 0;
+    font-size: 0;
+    transition: .5s ease;
 }
 
-.t-left h1 { 
-    font-size: 18px; 
-    font-weight: 600; 
+.options p:hover span {
+    opacity: 1;
+    scale: 1;
+    font-size: 15px;
+    gap: 10px;
+}
+
+.t-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.t-left img {
+    width: 44px;
+    height: 44px;
+    border-radius: 14px;
+    border: 2px solid rgba(168, 85, 247, 0.5);
+}
+
+.t-left h1 {
+    font-size: 18px;
+    font-weight: 600;
     background: linear-gradient(to right, #fff, #94a3b8);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -194,7 +217,8 @@ body {
     background: transparent;
     border: 1px solid var(--glass-border);
     color: var(--text-muted);
-    width: 40px; height: 40px;
+    width: 40px;
+    height: 40px;
     border-radius: 12px;
     margin-left: 12px;
     cursor: pointer;
@@ -203,25 +227,28 @@ body {
 }
 
 .t-right button:hover {
-    background: rgba(255,255,255,0.05);
+    background: rgba(255, 255, 255, 0.05);
     color: white;
-    border-color: rgba(255,255,255,0.3);
+    border-color: rgba(255, 255, 255, 0.3);
 }
 
 .t-right button span {
     position: absolute;
-    top: -5px; right: -5px;
+    top: -5px;
+    right: -5px;
     background: #ef4444;
     color: white;
     font-size: 10px;
-    width: 18px; height: 18px;
+    width: 18px;
+    height: 18px;
     border-radius: 50%;
     display: flex;
     justify-content: center;
     align-items: center;
     font-weight: bold;
 }
-.mems{
+
+.mems {
     opacity: 0;
 }
 
@@ -251,7 +278,7 @@ body {
     position: relative;
     font-size: 15px;
     line-height: 1.5;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     list-style: none;
     animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
@@ -265,11 +292,13 @@ body {
     margin-right: 0 !important;
 }
 
-.center-bottom li[style*="flex-end"] p { color: rgba(255,255,255,0.7); }
+.center-bottom li[style*="flex-end"] p {
+    color: rgba(255, 255, 255, 0.7);
+}
 
 /* THEIR MESSAGES (Using attribute selector to target flex-start) */
 .center-bottom li[style*="flex-start"] {
-    background: rgba(255,255,255,0.05) !important;
+    background: rgba(255, 255, 255, 0.05) !important;
     border: 1px solid var(--glass-border) !important;
     border-radius: 20px 20px 20px 4px !important;
     margin-left: 0 !important;
@@ -284,16 +313,27 @@ body {
     opacity: 0.5;
 }
 
+.pinned {
+    opacity: 0;
+}
+
+.center-bottom li:hover .pinned {
+    opacity: 1;
+    cursor: pointer;
+}
+
 /* Image in Chat */
 #img-chat {
     border-radius: 16px;
-    border: 2px solid rgba(255,255,255,0.1);
+    border: 2px solid rgba(255, 255, 255, 0.1);
     transition: transform 0.3s;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
     max-width: 50%;
 }
 
-#img-chat:hover { transform: scale(1.02); }
+#img-chat:hover {
+    transform: scale(1.02);
+}
 
 /* --- INPUT AREA --- */
 .input-box {
@@ -301,12 +341,12 @@ body {
     display: flex;
     gap: 12px;
     align-items: center;
-    background: linear-gradient(to top, rgba(0,0,0,0.4), transparent);
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.4), transparent);
 }
 
 .inputt {
     flex: 1;
-    background: rgba(255,255,255,0.03);
+    background: rgba(255, 255, 255, 0.03);
     border: 1px solid var(--glass-border);
     padding: 16px 24px;
     border-radius: 50px;
@@ -318,12 +358,13 @@ body {
 
 .inputt:focus {
     border-color: #a855f7;
-    background: rgba(255,255,255,0.05);
+    background: rgba(255, 255, 255, 0.05);
     box-shadow: 0 0 0 4px rgba(168, 85, 247, 0.1);
 }
 
 .input-box button {
-    width: 50px; height: 50px;
+    width: 50px;
+    height: 50px;
     border-radius: 50%;
     border: none;
     background: var(--primary-gradient);
@@ -335,10 +376,13 @@ body {
     box-shadow: var(--accent-glow);
 }
 
-.input-box button:hover { transform: scale(1.1); }
+.input-box button:hover {
+    transform: scale(1.1);
+}
 
 .custom-file-upload {
-    width: 50px; height: 50px;
+    width: 50px;
+    height: 50px;
     border-radius: 50%;
     border: 1px solid var(--glass-border);
     display: grid;
@@ -346,12 +390,12 @@ body {
     cursor: pointer;
     color: var(--text-muted);
     transition: 0.3s;
-    background: rgba(255,255,255,0.02);
+    background: rgba(255, 255, 255, 0.02);
 }
 
 .custom-file-upload:hover {
     color: white;
-    background: rgba(255,255,255,0.1);
+    background: rgba(255, 255, 255, 0.1);
 }
 
 /* --- RIGHT INFO PANEL --- */
@@ -364,7 +408,8 @@ body {
     box-shadow: none;
 }
 
-.right-top, .right-bottom {
+.right-top,
+.right-bottom {
     flex: 1;
     background: var(--glass-panel);
     border: 1px solid var(--glass-border);
@@ -374,7 +419,8 @@ body {
     position: relative;
 }
 
-.right-top h1, .right-bottom h1 {
+.right-top h1,
+.right-bottom h1 {
     font-size: 13px;
     font-weight: 700;
     letter-spacing: 1px;
@@ -385,8 +431,10 @@ body {
 
 .right-button {
     position: absolute;
-    top: 16px; right: 16px;
-    width: 30px; height: 30px;
+    top: 16px;
+    right: 16px;
+    width: 30px;
+    height: 30px;
     border-radius: 8px;
     border: 1px solid var(--glass-border);
     background: transparent;
@@ -396,7 +444,7 @@ body {
 
 .right-box ul li {
     list-style: none;
-    background: rgba(255,255,255,0.03);
+    background: rgba(255, 255, 255, 0.03);
     padding: 16px;
     border-radius: 16px;
     margin-bottom: 12px;
@@ -407,29 +455,37 @@ body {
 
 .right-box ul li:hover {
     border-color: rgba(168, 85, 247, 0.3);
-    background: rgba(255,255,255,0.05);
+    background: rgba(255, 255, 255, 0.05);
 }
 
-.right-box span { color: #cbd5e1; font-weight: 500; }
+.right-box span {
+    color: #cbd5e1;
+    font-weight: 500;
+}
 
 .complete {
     background: transparent;
     border: 1px solid #10b981;
     color: #10b981;
-    width: 24px; height: 24px;
+    width: 24px;
+    height: 24px;
     border-radius: 50%;
     margin-left: 10px;
     cursor: pointer;
 }
 
-.complete:hover { background: #10b981; color: black; }
+.complete:hover {
+    background: #10b981;
+    color: black;
+}
 
 /* --- OVERLAYS & MODALS --- */
 
 /* Create Group Modal */
 .new-group {
     position: fixed;
-    top: 50%; left: 50%;
+    top: 50%;
+    left: 50%;
     transform: translate(-50%, -50%) scale(0.9);
     opacity: 0;
     pointer-events: none;
@@ -439,7 +495,7 @@ body {
     border-radius: 24px;
     padding: 32px;
     z-index: 5000;
-    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -452,21 +508,39 @@ body {
     pointer-events: all;
 }
 
-.new-group h1 { font-size: 20px; margin-bottom: 20px; color: white; }
-.new-group input { 
-    width: 100%; padding: 12px; 
-    border-radius: 12px; border: 1px solid var(--glass-border);
-    background: rgba(0,0,0,0.3); color: white; margin-bottom: 16px;
+.new-group h1 {
+    font-size: 20px;
+    margin-bottom: 20px;
+    color: white;
 }
+
+.new-group input {
+    width: 100%;
+    padding: 12px;
+    border-radius: 12px;
+    border: 1px solid var(--glass-border);
+    background: rgba(0, 0, 0, 0.3);
+    color: white;
+    margin-bottom: 16px;
+}
+
 .new-group button {
-    width: 100%; padding: 12px; background: var(--primary-gradient);
-    border: none; border-radius: 12px; color: white; font-weight: 600; cursor: pointer;
+    width: 100%;
+    padding: 12px;
+    background: var(--primary-gradient);
+    border: none;
+    border-radius: 12px;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
 }
 
 /* Sliding Drawers */
-.search-nav, .request-tab {
+.search-nav,
+.request-tab {
     position: absolute;
-    top: 16px; bottom: 16px;
+    top: 16px;
+    bottom: 16px;
     width: 320px;
     background: rgba(15, 23, 42, 0.95);
     backdrop-filter: blur(20px);
@@ -475,20 +549,30 @@ body {
     z-index: 2000;
     transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
     padding: 24px;
-    box-shadow: 0 0 50px rgba(0,0,0,0.5);
+    box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
 }
 
-.search-nav { right: -350px; }
-.active-nav { right: 16px; }
+.search-nav {
+    right: -350px;
+}
 
-.request-tab { left: -350px; }
-.active-tab { left: 16px; }
+.active-nav {
+    right: 16px;
+}
+
+.request-tab {
+    left: -350px;
+}
+
+.active-tab {
+    left: 16px;
+}
 
 /* Image Viewer Overlay */
 .img-view {
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,0.95);
+    background: rgba(0, 0, 0, 0.95);
     z-index: 10000;
     display: grid;
     place-items: center;
@@ -504,46 +588,107 @@ body {
 
 .img-view button {
     position: absolute;
-    top: 40px; right: 40px;
-    background: rgba(255,255,255,0.1);
+    top: 40px;
+    right: 40px;
+    background: rgba(255, 255, 255, 0.1);
     border: none;
     color: white;
-    width: 40px; height: 40px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
     cursor: pointer;
     font-size: 20px;
 }
 
+.cross {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    color: var(--danger);
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 10px;
+}
+
 /* Animations */
 @keyframes popIn {
-    0% { opacity: 0; transform: scale(0.9) translateY(10px); }
-    100% { opacity: 1; transform: scale(1) translateY(0); }
+    0% {
+        opacity: 0;
+        transform: scale(0.9) translateY(10px);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; } to { opacity: 1; }
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
 }
 
 /* Scrollbar Polish */
-::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
 
 /* Option Menu */
 .options {
     position: absolute;
-    top: 70px; right: 20px;
+    top: 70px;
+    right: 20px;
     background: #1e293b;
     border: 1px solid var(--glass-border);
     padding: 8px;
     border-radius: 16px;
     display: none;
     flex-direction: column;
-    z-index:99999999999999999999999999999999;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    z-index: 99999999999999999999999999999999;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
 }
-.act { display: flex; animation: popIn 0.2s ease; }
+
+.act {
+    display: flex;
+    animation: popIn 0.2s ease;
+}
+
+
+.options-2 {
+    position: absolute;
+    top: 70px;
+    right: 0px;
+    background: #1e293b;
+    border: 1px solid var(--glass-border);
+    padding: 20px;
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    z-index: 99999999999999999999999999999999;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
 
 .options p {
     padding: 10px 20px;
@@ -554,10 +699,19 @@ body {
     white-space: nowrap;
 }
 
-.options p:hover { background: rgba(255,255,255,0.05); }
-.options p:first-child:hover { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
+.options p:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
 
-.min-page { display: none; }
+.options p:first-child:hover {
+    background: rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+}
+
+.min-page {
+    display: none;
+}
+
 @media (max-width: 1024px) {
     .min-page {
         display: grid;
@@ -576,47 +730,60 @@ body {
 /* --- NOTIFICATION TOAST --- */
 .notification {
     position: fixed;
-    top: -120px; /* Hidden above the screen */
+    top: -120px;
+    /* Hidden above the screen */
     left: 50%;
     transform: translateX(-50%);
     z-index: 20000;
-    
+
     /* Layout */
     display: flex;
     align-items: center;
     gap: 15px;
     padding: 16px 32px;
-    
+
     /* Glassmorphism & Shape */
     background: rgba(10, 15, 30, 0.95);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    border-radius: 100px; /* Pill shape */
-    
+    border-radius: 100px;
+    /* Pill shape */
+
     /* Border & Glow */
-    border: 1px solid rgba(16, 185, 129, 0.3); /* Emerald green subtle border */
-    box-shadow: 
-        0 10px 30px -5px rgba(0, 0, 0, 0.8), /* Deep drop shadow */
-        0 0 15px rgba(16, 185, 129, 0.3),    /* Inner Green Glow */
-        inset 0 0 20px rgba(16, 185, 129, 0.05); /* Glass reflection */
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    /* Emerald green subtle border */
+    box-shadow:
+        0 10px 30px -5px rgba(0, 0, 0, 0.8),
+        /* Deep drop shadow */
+        0 0 15px rgba(16, 185, 129, 0.3),
+        /* Inner Green Glow */
+        inset 0 0 20px rgba(16, 185, 129, 0.05);
+    /* Glass reflection */
 
     /* Animation Physics */
-    transition: top 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); /* "Spring/Bounce" effect */
+    transition: top 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+    /* "Spring/Bounce" effect */
 }
 
 /* Active State (Triggered by JS) */
 .not-act {
-    top: 40px; /* Drops down into view */
+    top: 40px;
+    /* Drops down into view */
 }
 
 /* Typography */
 .notification h1 {
     font-size: 16px;
     font-weight: 600;
-    color: #10b981; /* Bright Emerald Green */
+    color: #10b981;
+    /* Bright Emerald Green */
     margin: 0;
     padding: 0;
     letter-spacing: 0.5px;
+}
+
+.settings {
+    z-index: 9999999999999999999999999999999999999;
 }
 
 /* CSS-Only Checkmark Icon */
@@ -648,20 +815,25 @@ body {
 /* --- MOBILE & TABLET REDESIGN (The Supreme Adaptation) --- */
 
 @media screen and (max-width: 1024px) {
+
     /* 1. Layout Structure */
     .parent-container {
-        flex-direction: column; /* Stack elements vertically */
+        flex-direction: column;
+        height: 100vh;
         padding: 0;
         gap: 0;
-        background: var(--bg-deep); /* Solid background for performance */
+        background: var(--bg-deep);
+        /* Solid background for performance */
     }
 
     /* 2. Transform Sidebar into Top Navigation Bar */
     .left-box {
         width: 100%;
-        height: 85px; /* Fixed height for header */
+        height: 85px;
+        /* Fixed height for header */
         min-width: 0;
-        flex-direction: row; /* Align logo and list horizontally */
+        flex-direction: row;
+        /* Align logo and list horizontally */
         border-radius: 0 0 20px 20px;
         border: none;
         border-bottom: 1px solid var(--glass-border);
@@ -689,13 +861,17 @@ body {
 
     .left-bottom {
         flex: 1;
-        overflow-x: auto; /* Horizontal Scroll */
+        overflow-x: auto;
+        /* Horizontal Scroll */
         overflow-y: hidden;
         padding: 5px 10px;
         display: flex;
+        z-index: 1;
         align-items: center;
     }
-
+    .options-2{
+        z-index: 999999999999999999999*10;
+    }
     .left-bottom ul {
         display: flex;
         flex-direction: row;
@@ -706,9 +882,11 @@ body {
     .left-bottom li {
         margin: 0;
         padding: 6px 12px;
-        border-radius: 30px; /* Pill shape for mobile tabs */
+        border-radius: 30px;
+        /* Pill shape for mobile tabs */
         background: rgba(255, 255, 255, 0.03);
         min-width: fit-content;
+        z-index: 1;
         flex-direction: row;
     }
 
@@ -731,7 +909,8 @@ body {
     /* 3. The Main Chat Area */
     .center-box {
         width: 100%;
-        height: calc(100vh - 85px); /* Fill remaining height */
+        height: calc(100vh - 85px);
+        /* Fill remaining height */
         border-radius: 0;
         border: none;
         background: transparent;
@@ -754,7 +933,8 @@ body {
 
     /* Mobile Message Bubbles */
     .center-bottom li {
-        max-width: 80% !important; /* Wider bubbles for small screens */
+        max-width: 80% !important;
+        /* Wider bubbles for small screens */
         padding: 12px 16px !important;
         font-size: 14px;
     }
@@ -773,7 +953,7 @@ body {
         font-size: 14px;
     }
 
-    .input-box button, 
+    .input-box button,
     .custom-file-upload {
         width: 42px;
         height: 42px;
@@ -785,24 +965,36 @@ body {
     }
 
     /* 6. Adjust Drawers (Search/Requests) */
-    .search-nav, 
+    .search-nav,
     .request-tab {
-        width: 100%; /* Full width drawers */
+        width: 100%;
+        /* Full width drawers */
         height: 100%;
         top: 0;
         border-radius: 0;
         background: #020617;
     }
-    
-    .search-nav { right: -100%; }
-    .active-nav { right: 0; }
-    
-    .request-tab { left: -100%; }
-    .active-tab { left: 0; }
+
+    .search-nav {
+        right: -100%;
+    }
+
+    .active-nav {
+        right: 0;
+    }
+
+    .request-tab {
+        left: -100%;
+    }
+
+    .active-tab {
+        left: 0;
+    }
 
     /* 7. Modal Fixes */
     .new-group {
-        width: 90%; /* Fit screen width */
+        width: 90%;
+        /* Fit screen width */
         padding: 20px;
     }
 
@@ -810,7 +1002,7 @@ body {
         width: 100%;
         height: auto;
     }
-    
+
     /* 8. Notification Adjustment */
     .notification {
         width: 90%;
@@ -818,16 +1010,21 @@ body {
         padding: 12px 20px;
         font-size: 14px;
     }
-    
+
     .not-act {
         top: 20px;
+    }
+
+    .options-2,
+    .settings {
+        z-index: 9999999999999999999999999999999999999;
     }
 }
 
 /* --- SEARCH DRAWER STYLING --- */
 
 /* 1. Header Styling */
-.search-nav > h1 {
+.search-nav>h1 {
     font-size: 18px;
     font-weight: 700;
     text-transform: uppercase;
@@ -839,6 +1036,8 @@ body {
     padding-bottom: 16px;
     border-bottom: 1px solid var(--glass-border);
     text-align: center;
+    padding-top: 20px;
+
 }
 
 /* 2. The Search Input */
@@ -853,12 +1052,13 @@ body {
     outline: none;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     margin-bottom: 24px;
-    box-shadow: inset 0 2px 10px rgba(0,0,0,0.2);
+    box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.2);
 }
 
 .search-nav input:focus {
     background: rgba(168, 85, 247, 0.05);
-    border-color: #a855f7; /* Violet Accent */
+    border-color: #a855f7;
+    /* Violet Accent */
     box-shadow: 0 0 0 4px rgba(168, 85, 247, 0.1);
     transform: translateY(-2px);
 }
@@ -875,8 +1075,10 @@ body {
     flex-direction: column;
     gap: 12px;
     overflow-y: auto;
-    height: calc(100% - 120px); /* Adjust based on header/input height */
-    padding-right: 5px; /* Space for scrollbar */
+    height: calc(100% - 120px);
+    /* Adjust based on header/input height */
+    padding-right: 5px;
+    /* Space for scrollbar */
 }
 
 /* 4. Group Result Cards */
@@ -895,7 +1097,7 @@ body {
     background: rgba(255, 255, 255, 0.06);
     border-color: rgba(255, 255, 255, 0.15);
     transform: translateX(5px);
-    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
 }
 
 /* Group Name inside Card */
@@ -915,7 +1117,8 @@ body {
 /* 5. The "Join" Button */
 .search-nav li button {
     padding: 8px 18px;
-    background: var(--primary-gradient); /* Uses your global violet gradient */
+    background: var(--primary-gradient);
+    /* Uses your global violet gradient */
     border: none;
     border-radius: 8px;
     color: white;
@@ -937,13 +1140,169 @@ body {
 .search-nav ul::-webkit-scrollbar {
     width: 4px;
 }
+
 .search-nav ul::-webkit-scrollbar-track {
     background: transparent;
 }
+
 .search-nav ul::-webkit-scrollbar-thumb {
     background: rgba(255, 255, 255, 0.1);
     border-radius: 10px;
 }
+
 .search-nav ul::-webkit-scrollbar-thumb:hover {
     background: rgba(255, 255, 255, 0.2);
+}
+
+/* --- REQUEST DRAWER STYLING --- */
+
+/* 1. Header Styling (Matches Search Drawer) */
+.request-tab>h1 {
+    font-size: 18px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    background: linear-gradient(to right, #fff, #94a3b8);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--glass-border);
+    text-align: center;
+    padding-top: 20px;
+}
+
+/* 2. The List Container */
+.request-tab ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    overflow-y: auto;
+    height: calc(100% - 60px);
+    padding-right: 5px;
+}
+
+/* 3. The Request Card */
+.request-tab li {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--glass-border);
+    border-radius: 20px;
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.request-tab li:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.15);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+}
+
+/* 4. User Info Section */
+.request-tab .txt {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+/* Username */
+.request-tab .txt h1 {
+    font-size: 16px;
+    font-weight: 600;
+    color: white;
+    margin: 0;
+    letter-spacing: 0.5px;
+}
+
+/* Group Name Label */
+.request-tab .txt p {
+    font-size: 12px;
+    color: #94a3b8;
+    /* Slate 400 */
+    font-weight: 400;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* Add a visual "arrow" before group name to imply context */
+.request-tab .txt p::before {
+    content: '↳';
+    font-size: 14px;
+    color: #64748b;
+}
+
+/* 5. Action Buttons Container */
+/* We use flex-wrap or grid to place buttons side-by-side */
+.request-tab li button {
+    flex: 1;
+    padding: 10px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+    border: 1px solid transparent;
+}
+
+/* Wrapper for buttons (You might need to wrap them in a div in JSX, 
+   but here is a CSS Grid hack if you keep them direct children) */
+.request-tab li {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto;
+    column-gap: 10px;
+}
+
+.request-tab .txt {
+    grid-column: 1 / -1;
+    /* Text takes full width */
+    margin-bottom: 4px;
+}
+
+/* 6. Button Variants */
+
+/* ACCEPT Button (Green) */
+.request-tab li button:first-of-type {
+    background: rgba(16, 185, 129, 0.1);
+    /* Emerald Tint */
+    color: #10b981;
+    border-color: rgba(16, 185, 129, 0.2);
+}
+
+.request-tab li button:first-of-type:hover {
+    background: #10b981;
+    color: #020617;
+    /* Dark text for contrast */
+    box-shadow: 0 0 15px rgba(16, 185, 129, 0.4);
+}
+
+/* REJECT Button (Red) */
+.request-tab li button:last-of-type {
+    background: rgba(239, 68, 68, 0.1);
+    /* Red Tint */
+    color: #ef4444;
+    border-color: rgba(239, 68, 68, 0.2);
+}
+
+.request-tab li button:last-of-type:hover {
+    background: rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+    border-color: #ef4444;
+}
+
+/* 7. Scrollbar Polish */
+.request-tab ul::-webkit-scrollbar {
+    width: 4px;
+}
+
+.request-tab ul::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
 }

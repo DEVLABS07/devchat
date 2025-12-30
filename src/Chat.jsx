@@ -8,6 +8,7 @@ import { jwtDecode } from 'jwt-decode'
 const Chat = () => {
     const [user, setUser] = useState('');
     const [task, setTask] = useState([]);
+    const [settings, setSettings] = useState(false);
     const [groupChange, setgroupChange] = useState(false);
     const [requestList, setRequestList] = useState([]);
     const [Admin, setAdmin] = useState('');
@@ -496,7 +497,7 @@ const Chat = () => {
                         <button onClick={() => document.querySelector('.request-tab').classList.toggle('active-tab')}><i class="fa-solid fa-envelope"></i> <span className='mems'>{requestList.length}</span></button>
                         <button onClick={() => document.querySelector('.search-nav').classList.toggle('active-nav')}><i class="fa-solid fa-magnifying-glass"></i></button>
                         {groupName && <button onClick={() => document.querySelector('.options').classList.toggle('act')}><i class="fa-solid fa-ellipsis-vertical"></i></button>}
-                        <button><i class="fa-solid fa-gear"></i></button>
+                        <button className='settings' onClick={() => setSettings(!settings)}><i class="fa-solid fa-gear"></i>{ settings && <div className="options-2"><p onClick={() => {setSettings(false); localStorage.clear(); navigate("/login")}}>Logout</p></div> }</button>
                     </div>
                 </div>
                 <div className="center-bottom">
@@ -506,7 +507,7 @@ const Chat = () => {
                     </div>
                     <ul ref={scrollRef}>
                         {messageList.map((element, key) => (
-                            element.group ? element.type == 'img' ? <img onClick={() => handleImgView(element.message)} style={{ alignSelf: element.sender == user ? 'flex-end' : 'flex-start', marginLeft: element.sender == user ? 0 : 15, marginRight: element.sender == user ? 15 : 0, zIndex: 2000 }} src={element.message} id='img-chat'></img> : <li key={key} style={{ maxWidth: '50%', height: 'fit-content', background: 'transparent', padding: 10, borderRadius: 10, borderWidth: 1, borderStyle: 'solid', borderColor: element.sender == user ? "#1db954" : 'white', color: 'white', listStyle: 'none', alignSelf: element.sender == user ? 'flex-end' : 'flex-start', marginLeft: element.sender == user ? 0 : 15, marginRight: element.sender == user ? 15 : 0 }}>{element.message}                         <p>{element.sender}</p><span onClick={() => savepinned(element.sender, element.message)}><i class="fa-solid fa-map-pin"></i></span></li> : ''
+                            element.group ? element.type == 'img' ? <img onClick={() => handleImgView(element.message)} style={{ alignSelf: element.sender == user ? 'flex-end' : 'flex-start', marginLeft: element.sender == user ? 0 : 15, marginRight: element.sender == user ? 15 : 0, zIndex: 2000 }} src={element.message} id='img-chat'></img> : <li key={key} style={{ maxWidth: '50%', height: 'fit-content', background: 'transparent', padding: 10, borderRadius: 10, borderWidth: 1, borderStyle: 'solid', borderColor: element.sender == user ? "#1db954" : 'white', color: 'white', listStyle: 'none', alignSelf: element.sender == user ? 'flex-end' : 'flex-start', marginLeft: element.sender == user ? 0 : 15, marginRight: element.sender == user ? 15 : 0 }}>{element.message}                         <p>{element.sender}</p><span onClick={() => savepinned(element.sender, element.message)} className='pinned'><i class="fa-solid fa-map-pin"></i></span></li> : ''
                         ))}
                     </ul>
                     <div className="input-box">
@@ -531,7 +532,7 @@ const Chat = () => {
                     {user == Admin ? <button className='right-button' onClick={addModule}><i class="fa-solid fa-plus"></i></button> : ''}
                     <ul>
                         {task.map((element, key) => (
-                            <li key={key} style={{ opacity: element.task ? 1 : 0 }}>Module:  <span>{element.task}</span> <br></br> Developer: <span>{element.person}</span> {element.person == user ? <button className='complete' onClick={() => deltask(key, element.task)}><i class="fa-solid fa-check"></i></button> : ''}</li>
+                            <li key={key} style={{ opacity: element.task ? 1 : 0 }}>Task:  <span>{element.task}</span> <br></br> Assigned Person: <span>{element.person}</span> {element.person == user ? <button className='complete' onClick={() => deltask(key, element.task)}><i class="fa-solid fa-check"></i></button> : ''}</li>
                         ))}
                     </ul>
                 </div>
@@ -546,6 +547,7 @@ const Chat = () => {
             </div>
             <div className="search-nav">
                 <h1>Search New Groups</h1>
+                 <button className='cross' onClick={() => document.querySelector('.search-nav').classList.toggle('active-nav')}><i class="fa-solid fa-xmark"></i></button>
                 <input id='searchinput' onChange={() => setSearchActivate(true)} placeholder="Enter your Group's name" onKeyDown={(e) => {
                     if (e.key === 'Enter') {
                         getSearch();
@@ -562,6 +564,7 @@ const Chat = () => {
             </div>
             <div className="request-tab">
                 <h1>Requests</h1>
+                <button className='cross' onClick={() => document.querySelector('.request-tab').classList.toggle('active-tab')}><i class="fa-solid fa-xmark"></i></button>
                 <ul>
                     {requestList &&
                         requestList.map((element, key) => (
