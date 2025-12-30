@@ -56,7 +56,7 @@ const Chat = () => {
         fetchGroups();
     }, [searchActivate])
     useEffect(() => {
-        const ws = new WebSocket(`https://devchat-936f.onrender.com/ws/${groupName}`);
+        const ws = new WebSocket(`http://127.0.0.1:8000/ws/${groupName}`);
         wsa.current = ws;
 
 
@@ -459,6 +459,7 @@ const Chat = () => {
             </div>
             {activateimgView && <div className="img-view"><button onClick={() => setActivateImgView(false)}><i class="fa-solid fa-xmark"></i></button><img src={imgView}></img></div>}
             <div className="new-group" id='group'>
+                <div className='cross' style={{display:"flex", alignItems:"center",justifyContent:"center", textAlign:"center"}} onClick={() => document.getElementById('group').classList.toggle('slide-bottom')}><i class="fa-solid fa-xmark"></i></div>
                 <h1>Name of the Group</h1>
                 <input id='groupname' placeholder="Enter your Group's Name" type='text'></input>
                 <input
@@ -497,7 +498,7 @@ const Chat = () => {
                         <button onClick={() => document.querySelector('.request-tab').classList.toggle('active-tab')}><i class="fa-solid fa-envelope"></i> <span className='mems'>{requestList.length}</span></button>
                         <button onClick={() => document.querySelector('.search-nav').classList.toggle('active-nav')}><i class="fa-solid fa-magnifying-glass"></i></button>
                         {groupName && <button onClick={() => document.querySelector('.options').classList.toggle('act')}><i class="fa-solid fa-ellipsis-vertical"></i></button>}
-                        <button className='settings' onClick={() => setSettings(!settings)}><i class="fa-solid fa-gear"></i>{ settings && <div className="options-2"><p onClick={() => {setSettings(false); localStorage.clear(); navigate("/login")}}>Logout</p></div> }</button>
+                        <button className='settings' onClick={() => setSettings(!settings)}><i class="fa-solid fa-gear"></i>{settings && <div className="options-2"><p onClick={() => { setSettings(false); localStorage.clear(); navigate("/login") }}>Logout</p></div>}</button>
                     </div>
                 </div>
                 <div className="center-bottom">
@@ -547,7 +548,7 @@ const Chat = () => {
             </div>
             <div className="search-nav">
                 <h1>Search New Groups</h1>
-                 <button className='cross' onClick={() => document.querySelector('.search-nav').classList.toggle('active-nav')}><i class="fa-solid fa-xmark"></i></button>
+                <button className='cross' onClick={() => document.querySelector('.search-nav').classList.toggle('active-nav')}><i class="fa-solid fa-xmark"></i></button>
                 <input id='searchinput' onChange={() => setSearchActivate(true)} placeholder="Enter your Group's name" onKeyDown={(e) => {
                     if (e.key === 'Enter') {
                         getSearch();

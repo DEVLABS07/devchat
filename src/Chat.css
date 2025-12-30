@@ -819,10 +819,12 @@ body {
     /* 1. Layout Structure */
     .parent-container {
         flex-direction: column;
-        height: 100vh;
+        height:93vh;
+        padding-bottom: 0px;
         padding: 0;
         gap: 0;
         background: var(--bg-deep);
+        overflow-x: hidden;
         /* Solid background for performance */
     }
 
@@ -869,9 +871,11 @@ body {
         z-index: 1;
         align-items: center;
     }
-    .options-2{
+
+    .options-2 {
         z-index: 999999999999999999999*10;
     }
+
     .left-bottom ul {
         display: flex;
         flex-direction: row;
@@ -883,7 +887,6 @@ body {
         margin: 0;
         padding: 6px 12px;
         border-radius: 30px;
-        /* Pill shape for mobile tabs */
         background: rgba(255, 255, 255, 0.03);
         min-width: fit-content;
         z-index: 1;
@@ -929,6 +932,7 @@ body {
     .center-bottom ul {
         padding: 15px;
         gap: 12px;
+        padding-bottom: 80px;
     }
 
     /* Mobile Message Bubbles */
@@ -941,11 +945,14 @@ body {
 
     /* 4. Input Area (Fixed to bottom) */
     .input-box {
+        width: 100%;
         padding: 12px;
         background: #0f172a;
         border-top: 1px solid var(--glass-border);
-        position: sticky;
-        bottom: 0;
+        position: fixed;
+        bottom: 0px;
+        left: 0;
+        z-index: 999999999999999;
     }
 
     .inputt {
