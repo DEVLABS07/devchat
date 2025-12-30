@@ -5,8 +5,65 @@ import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
 import { jwtDecode } from 'jwt-decode'
 
+
+
+const AddTaskModal = ({ isOpen, onClose, onAdd }) => {
+    const [taskDetails, setTaskDetails] = useState({ task: '', person: '' });
+
+    if (!isOpen) return null;
+
+    const handleSubmit = () => {
+        if (!taskDetails.task.trim() || !taskDetails.person.trim()) return;
+        onAdd(taskDetails.task, taskDetails.person);
+        setTaskDetails({ task: '', person: '' }); // Reset
+        onClose();
+    };
+
+
+
+    return (
+        <div className="task-overlay">
+            <div className="task-modal">
+                <div className="task-header">
+                    <h1>New Assignment</h1>
+                    <button className="cross-small" onClick={onClose}>
+                        <i className="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+
+                <div className="task-body">
+                    <div className="input-group">
+                        <label>Task Description</label>
+                        <input
+                            type="text"
+                            placeholder="e.g. Fix Navigation Bar"
+                            value={taskDetails.task}
+                            onChange={(e) => setTaskDetails({ ...taskDetails, task: e.target.value })}
+                        />
+                    </div>
+
+                    <div className="input-group">
+                        <label>Assignee</label>
+                        <input
+                            type="text"
+                            placeholder="Enter Member Name"
+                            value={taskDetails.person}
+                            onChange={(e) => setTaskDetails({ ...taskDetails, person: e.target.value })}
+                        />
+                    </div>
+
+                    <button className="assign-btn" onClick={handleSubmit}>
+                        Assign Task <i className="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+};
+
 const Chat = () => {
     const [user, setUser] = useState('');
+    const [showTaskModal, setShowTaskModal] = useState(false);
     const [task, setTask] = useState([]);
     const [settings, setSettings] = useState(false);
     const [groupChange, setgroupChange] = useState(false);
@@ -28,7 +85,6 @@ const Chat = () => {
     const navigate = useNavigate();
     const json = localStorage.getItem('token');
     const [img, setImg] = useState();
-
 
     useEffect(() => {
         const token = localStorage.getItem('token');
@@ -56,7 +112,7 @@ const Chat = () => {
         fetchGroups();
     }, [searchActivate])
     useEffect(() => {
-        const ws = new WebSocket(`http://127.0.0.1:8000/ws/${groupName}`);
+        const ws = new WebSocket(`https://devchat-936f.onrender.com/ws/${groupName}`);
         wsa.current = ws;
 
 
@@ -210,44 +266,9 @@ const Chat = () => {
 
     }, [user])
 
-
-
-
-
-
-
-
-    useEffect(() => {
-        if (groupChange) {
-            setgroupChange(false);
-            return;
-        }
-        const saveChat = async () => {
-            if (messageList.length == 0) return;
-            const response = await axios.post('https://devchat-936f.onrender.com/savechat', {
-                group: groupName,
-                messages: messageList,
-            }, {
-                headers: {
-                    Authorization: `${json}`
-                }
-            })
-        }
-        saveChat();
-    }, [messageList])
-
-
-    function appendArr() {
-        const message = document.querySelector('.inputt').value;
-        if (!message.trim()) return;
-        setMessageList(prev => [...prev, { sender: user, message: message, key: 3, group: groupName, type: 'msg' }]);
-        wsa.current.send(JSON.stringify({ message: message, username: user, group: groupName, type: message ? 'txt' : 'img' }));
-        document.querySelector('.inputt').value = '';
-    }
-
-    const addModule = async () => {
-        const assignment = prompt('Enter the assignment needed to be assigned');
-        const person = prompt('Enter the name of the person');
+   
+   
+    const addModule = async (assignment, person) => {
         if (!assignment.trim() || !person.trim()) return;
         setTask(prev => [...prev, { task: assignment, person: person }]);
         try {
@@ -266,172 +287,182 @@ const Chat = () => {
         }
     }
 
-    const deltask = async (key, task) => {
-        try {
-            const response = await axios.post('https://devchat-936f.onrender.com/deltask', {
-                task: task
+
+
+
+
+
+        useEffect(() => {
+            if (groupChange) {
+                setgroupChange(false);
+                return;
+            }
+            const saveChat = async () => {
+                if (messageList.length == 0) return;
+                const response = await axios.post('https://devchat-936f.onrender.com/savechat', {
+                    group: groupName,
+                    messages: messageList,
+                }, {
+                    headers: {
+                        Authorization: `${json}`
+                    }
+                })
+            }
+            saveChat();
+        }, [messageList])
+
+
+        function appendArr() {
+            const message = document.querySelector('.inputt').value;
+            if (!message.trim()) return;
+            setMessageList(prev => [...prev, { sender: user, message: message, key: 3, group: groupName, type: 'msg' }]);
+            wsa.current.send(JSON.stringify({ message: message, username: user, group: groupName, type: message ? 'txt' : 'img' }));
+            document.querySelector('.inputt').value = '';
+        }
+
+
+
+        const deltask = async (key, task) => {
+            try {
+                const response = await axios.post('https://devchat-936f.onrender.com/deltask', {
+                    task: task
+                }, {
+                    headers: {
+                        Authorization: `${json}`
+                    }
+                })
+                setTask(prev => prev.filter((_, i) => i !== key))
+            }
+            catch (error) {
+                console.log("Error Deleting:", error);
+            }
+        }
+
+        useEffect(() => {
+            scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+            if (messageList && messageList.length > 0) {
+                const lastobj = messageList[messageList.length - 1];
+                setLastMessage(lastobj.message);
+            } else {
+                setLastMessage('');
+            }
+        }, [messageList])
+
+
+
+
+
+
+
+
+        const createGroup = async () => {
+            document.getElementById('group').classList.toggle('slide-bottom');
+            const groupName = document.getElementById('groupname').value;
+            if (!groupName.trim()) return;
+            const saveGroup = await axios.post('https://devchat-936f.onrender.com/newchat', {
+                username: user,
+                logo: img ? img : 'null',
+                group: groupName,
+                member: [user]
             }, {
                 headers: {
                     Authorization: `${json}`
                 }
             })
-            setTask(prev => prev.filter((_, i) => i !== key))
-        }
-        catch (error) {
-            console.log("Error Deleting:", error);
-        }
-    }
-
-    useEffect(() => {
-        scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-        if (messageList && messageList.length > 0) {
-            const lastobj = messageList[messageList.length - 1];
-            setLastMessage(lastobj.message);
-        } else {
-            setLastMessage('');
-        }
-    }, [messageList])
-
-
-
-
-
-
-
-
-    const createGroup = async () => {
-        document.getElementById('group').classList.toggle('slide-bottom');
-        const groupName = document.getElementById('groupname').value;
-        if (!groupName.trim()) return;
-        const saveGroup = await axios.post('https://devchat-936f.onrender.com/newchat', {
-            username: user,
-            logo: img ? img : 'null',
-            group: groupName,
-            member: [user]
-        }, {
-            headers: {
-                Authorization: `${json}`
+            if (saveGroup.data.code == 123) {
+                alert(saveGroup.data.message);
+                return;
             }
-        })
-        if (saveGroup.data.code == 123) {
-            alert(saveGroup.data.message);
-            return;
+            else {
+                setGroupList(prev => [...prev, { Group: groupName, Logo: img }]);
+            }
         }
-        else {
-            setGroupList(prev => [...prev, { Group: groupName, Logo: img }]);
-        }
-    }
 
-    const handleRequest = async (groupe) => {
-        const json = localStorage.getItem('token');
-        const response = await axios.post('https://devchat-936f.onrender.com/req', {
-            username: user,
-            group: groupe
-        },
-            {
+        const handleRequest = async (groupe) => {
+            const json = localStorage.getItem('token');
+            const response = await axios.post('https://devchat-936f.onrender.com/req', {
+                username: user,
+                group: groupe
+            },
+                {
+                    headers: {
+                        Authorization: `${json}`
+                    }
+                }
+            )
+
+            document.querySelector('.search-nav').classList.toggle('active-nav');
+            document.querySelector('.notification').classList.toggle('not-act');
+            setTimeout(() => {
+                document.querySelector('.notification').classList.toggle('not-act');
+            }, 2000);
+        }
+
+        const reqCondition = async (name, condition, group) => {
+            const response = await axios.post("https://devchat-936f.onrender.com/handreq", {
+                username: name,
+                group: group,
+                response: condition
+            }, {
                 headers: {
                     Authorization: `${json}`
                 }
-            }
-        )
+            })
+            document.querySelector('.request-tab').classList.toggle('active-tab')
+        }
 
-        document.querySelector('.search-nav').classList.toggle('active-nav');
-        document.querySelector('.notification').classList.toggle('not-act');
-        setTimeout(() => {
-            document.querySelector('.notification').classList.toggle('not-act');
-        }, 2000);
-    }
-
-    const reqCondition = async (name, condition, group) => {
-        const response = await axios.post("https://devchat-936f.onrender.com/handreq", {
-            username: name,
-            group: group,
-            response: condition
-        }, {
-            headers: {
-                Authorization: `${json}`
-            }
-        })
-        document.querySelector('.request-tab').classList.toggle('active-tab')
-    }
-
-    const leaveGroup = async () => {
-        document.querySelector('.options').classList.toggle('act');
-        const response = await axios.post("https://devchat-936f.onrender.com/exitgroup", {
-            group: groupName,
-            username: user
-        }, {
-            headers: {
-                Authorization: `${json}`
-            }
-        });
-    }
-    const savepinned = async (user, message) => {
-        try {
-            const response = await axios.post('https://devchat-936f.onrender.com/savepinned', {
+        const leaveGroup = async () => {
+            document.querySelector('.options').classList.toggle('act');
+            const response = await axios.post("https://devchat-936f.onrender.com/exitgroup", {
                 group: groupName,
-                message: message,
                 username: user
             }, {
                 headers: {
                     Authorization: `${json}`
                 }
-            })
-            setPinnedlist(prev => [{ message: message, username: user, group: groupName }, ...prev]);
-        } catch (error) {
-            console.error('Error', error);
+            });
         }
-    }
+        const savepinned = async (user, message) => {
+            try {
+                const response = await axios.post('https://devchat-936f.onrender.com/savepinned', {
+                    group: groupName,
+                    message: message,
+                    username: user
+                }, {
+                    headers: {
+                        Authorization: `${json}`
+                    }
+                })
+                setPinnedlist(prev => [{ message: message, username: user, group: groupName }, ...prev]);
+            } catch (error) {
+                console.error('Error', error);
+            }
+        }
 
-    const getSearch = async () => {
-        try {
-            const query = document.getElementById('searchinput').value;
-            if (!query.trim()) return;
-            const response = await axios.post('https://devchat-936f.onrender.com/searchgroup', {
-                query: query
-            }, {
-                headers: {
-                    Authorization: `${json}`
+        const getSearch = async () => {
+            try {
+                const query = document.getElementById('searchinput').value;
+                if (!query.trim()) return;
+                const response = await axios.post('https://devchat-936f.onrender.com/searchgroup', {
+                    query: query
+                }, {
+                    headers: {
+                        Authorization: `${json}`
+                    }
+                })
+                if (response.data.results == 0) {
+                    alert("No Groups are availabe with the Provided Name")
                 }
-            })
-            if (response.data.results == 0) {
-                alert("No Groups are availabe with the Provided Name")
+                else {
+                    setSearchData(response.data.results);
+                }
+            } catch (error) {
+                console.error("Error:", error);
             }
-            else {
-                setSearchData(response.data.results);
-            }
-        } catch (error) {
-            console.error("Error:", error);
         }
-    }
 
-    const handleUpload = async (e) => {
-        const file = e.target.files[0];
-        const formData = new FormData();
-        formData.append("file", file);
-        const res = await axios.post("https://devchat-936f.onrender.com/upload", formData, {
-            headers: {
-                Authorization: `${json}`
-            }
-        });
-        setMessageList(prev => [...prev, {
-            group: groupName,
-            sender: user,
-            message: `${res.data.url}`,
-            key: 3,
-            type: 'img'
-        }])
-        wsa.current.send(JSON.stringify({ message: res.data.url, username: user, group: groupName, type: 'img' }));
-        e.target.value = null;
-    };
-
-    const handleUploadimg = async (e) => {
-        const file = e.target.files[0];
-        try {
-            if (!file) {
-                setImg(null);
-                return;
-            }
+        const handleUpload = async (e) => {
+            const file = e.target.files[0];
             const formData = new FormData();
             formData.append("file", file);
             const res = await axios.post("https://devchat-936f.onrender.com/upload", formData, {
@@ -439,158 +470,218 @@ const Chat = () => {
                     Authorization: `${json}`
                 }
             });
-            setImg(res.data.url);
+            setMessageList(prev => [...prev, {
+                group: groupName,
+                sender: user,
+                message: `${res.data.url}`,
+                key: 3,
+                type: 'img'
+            }])
+            wsa.current.send(JSON.stringify({ message: res.data.url, username: user, group: groupName, type: 'img' }));
+            e.target.value = null;
+        };
 
-        } catch (err) {
-            console.error("Upload failed", err);
+        const handleUploadimg = async (e) => {
+            const file = e.target.files[0];
+            try {
+                if (!file) {
+                    setImg(null);
+                    return;
+                }
+                const formData = new FormData();
+                formData.append("file", file);
+                const res = await axios.post("https://devchat-936f.onrender.com/upload", formData, {
+                    headers: {
+                        Authorization: `${json}`
+                    }
+                });
+                setImg(res.data.url);
+
+            } catch (err) {
+                console.error("Upload failed", err);
+            }
         }
-    }
 
 
-    const handleImgView = (a) => {
-        setImgView(a);
-        setActivateImgView(true);
-    }
+        const handleImgView = (a) => {
+            setImgView(a);
+            setActivateImgView(true);
+        }
 
-    return (
-        <div className='parent-container'>
-            <div className="notification">
-                <h1>Request Sent!</h1>
-            </div>
-            {activateimgView && <div className="img-view"><button onClick={() => setActivateImgView(false)}><i class="fa-solid fa-xmark"></i></button><img src={imgView}></img></div>}
-            <div className="new-group" id='group'>
-                <div className='cross' style={{display:"flex", alignItems:"center",justifyContent:"center", textAlign:"center"}} onClick={() => document.getElementById('group').classList.toggle('slide-bottom')}><i class="fa-solid fa-xmark"></i></div>
-                <h1>Name of the Group</h1>
-                <input id='groupname' placeholder="Enter your Group's Name" type='text'></input>
-                <input
-                    id="img-upload"
-                    type="file"
-                    onChange={handleUploadimg}
-                />
-                <button onClick={createGroup}>Create Group</button>
-            </div>
-            <div className="left-box">
-                <div className="left-top">
-                    <img src={Logo} />
-                    <button onClick={() => document.getElementById('group').classList.toggle('slide-bottom')}><i class="fa-solid fa-plus"></i></button>
+        return (
+            <div className='parent-container'>
+                <div className="notification">
+                    <h1>Request Sent!</h1>
                 </div>
-                <div className="left-bottom">
-                    <ul>
-                        {groupList ? groupList.map((element, key) => (
-                            <li key={key} onClick={() => setGroupName(element.Group)} style={{ backgroundColor: groupName == element.Group ? '#383636' : '' }}>
-                                <img src={element.Logo == 'null' ? Logo : element.Logo} />
-                                <div className="txt">
-                                    <h1 className='chat-name'>{element.Group}</h1>
-                                    {groupName == element.Group && <p>{lastMessage}</p>}
-                                </div>
-                            </li>
-                        )) : ''}
-                    </ul>
+                {activateimgView && <div className="img-view"><button onClick={() => setActivateImgView(false)}><i class="fa-solid fa-xmark"></i></button><img src={imgView}></img></div>}
+                <div className="new-group" id='group'>
+                    <div className='cross' style={{ display: "flex", alignItems: "center", justifyContent: "center", textAlign: "center" }} onClick={() => document.getElementById('group').classList.toggle('slide-bottom')}><i class="fa-solid fa-xmark"></i></div>
+                    <h1>Name of the Group</h1>
+                    <input id='groupname' placeholder="Enter your Group's Name" type='text'></input>
+                    <input
+                        id="img-upload"
+                        type="file"
+                        onChange={handleUploadimg}
+                    />
+                    <button onClick={createGroup}>Create Group</button>
                 </div>
-            </div>
-            <div className="center-box">
-                <div className="center-top">
-                    <div className="t-left">
-                        {groupName && <img src={logo == 'null' ? Logo : logo} />}
+                <div className="left-box">
+                    <div className="left-top">
+                        <img src={Logo} />
+                        <button onClick={() => document.getElementById('group').classList.toggle('slide-bottom')}><i class="fa-solid fa-plus"></i></button>
+                    </div>
+                    <div className="left-bottom">
+                        <ul>
+                            {groupList ? groupList.map((element, key) => (
+                                <li key={key} onClick={() => setGroupName(element.Group)} style={{ backgroundColor: groupName == element.Group ? '#383636' : '' }}>
+                                    <img src={element.Logo == 'null' ? Logo : element.Logo} />
+                                    <div className="txt">
+                                        <h1 className='chat-name'>{element.Group}</h1>
+                                        {groupName == element.Group && <p>{lastMessage.includes
+                                            ("https://res.cloudinary") ? "Media message" : lastMessage}</p>}
+                                    </div>
+                                </li>
+                            )) : ''}
+                        </ul>
+                    </div>
+                </div>
+                <div className="center-box">
+                    <div className="center-top">
+                        <div className="t-left">
+                            {groupName && <img src={logo == 'null' ? Logo : logo} />}
+                            <h1>{groupName}</h1>
+                        </div>
+                        <div className="t-right">
+                            <button onClick={() => document.querySelector('.request-tab').classList.toggle('active-tab')}><i class="fa-solid fa-envelope"></i> <span className='mems'>{requestList.length}</span></button>
+                            <button onClick={() => document.querySelector('.search-nav').classList.toggle('active-nav')}><i class="fa-solid fa-magnifying-glass"></i></button>
+                            {groupName && <button onClick={() => document.querySelector('.options').classList.toggle('act')}><i class="fa-solid fa-ellipsis-vertical"></i></button>}
+                            <button className='settings' onClick={() => setSettings(!settings)}><i class="fa-solid fa-gear"></i>{settings && <div className="options-2"><p onClick={() => { setSettings(false); localStorage.clear(); navigate("/login") }}>Logout</p></div>}</button>
+                        </div>
+                    </div>
+                    <div className="center-bottom">
+                        <div className="options">
+                            <button className="mobile-info-btn" onClick={() => document.querySelector('.right-box-mob').classList.add('active-info')}>
+                                <i class="fa-solid fa-circle-info"></i>
+                            </button>
+                            <p> <strong>Group Info </strong> {members.map(element => (<span>{`${element}`}</span>))}</p>
+                            <p onClick={leaveGroup}>Delete Group</p>
+
+                        </div>
+                        <ul ref={scrollRef}>
+                            {messageList.map((element, key) => (
+                                element.group ? element.type == 'img' ? <img onClick={() => handleImgView(element.message)} style={{ alignSelf: element.sender == user ? 'flex-end' : 'flex-start', marginLeft: element.sender == user ? 0 : 15, marginRight: element.sender == user ? 15 : 0, zIndex: 2000 }} src={element.message} id='img-chat'></img> : <li key={key} style={{ maxWidth: '50%', height: 'fit-content', background: 'transparent', padding: 10, borderRadius: 10, borderWidth: 1, borderStyle: 'solid', borderColor: element.sender == user ? "#1db954" : 'white', color: 'white', listStyle: 'none', alignSelf: element.sender == user ? 'flex-end' : 'flex-start', marginLeft: element.sender == user ? 0 : 15, marginRight: element.sender == user ? 15 : 0 }}>{element.message}                         <p>{element.sender}</p><span onClick={() => savepinned(element.sender, element.message)} className='pinned'><i class="fa-solid fa-map-pin"></i></span></li> : ''
+                            ))}
+                        </ul>
+                        <div className="input-box">
+                            {groupName && <input className='inputt' type='text' placeholder='Enter your Message' onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                    appendArr();
+                                }
+                            }}></input>}
+                            {groupName && <button onClick={appendArr}><i class="fa-solid fa-paper-plane"></i></button>}
+                            {groupName && <label htmlFor="file-upload" className="custom-file-upload"><i class="fa-solid fa-file"></i></label>}
+                            <input
+                                id="file-upload"
+                                type="file"
+                                onChange={handleUpload}
+                                style={{ display: "none" }}
+                            />                    </div>
+                    </div>
+                </div>
+                <div className="right-box-mob">
+                    <button className="cross" onClick={() => document.querySelector('.right-box-mob').classList.remove('active-info')}>
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                    <div className="right-top">
                         <h1>{groupName}</h1>
+                        {user == Admin ? <button className='right-button' onClick={() => setShowTaskModal(true)}><i class="fa-solid fa-plus"></i></button> : ''}
+                        <ul>
+                            {task.map((element, key) => (
+                                <li key={key} style={{ opacity: element.task ? 1 : 0 }}>Task:  <span>{element.task}</span> <br></br> Assigned Person: <span>{element.person}</span> {element.person == user ? <button className='complete' onClick={() => deltask(key, element.task)}><i class="fa-solid fa-check"></i></button> : ''}</li>
+                            ))}
+                        </ul>
                     </div>
-                    <div className="t-right">
-                        <button onClick={() => document.querySelector('.request-tab').classList.toggle('active-tab')}><i class="fa-solid fa-envelope"></i> <span className='mems'>{requestList.length}</span></button>
-                        <button onClick={() => document.querySelector('.search-nav').classList.toggle('active-nav')}><i class="fa-solid fa-magnifying-glass"></i></button>
-                        {groupName && <button onClick={() => document.querySelector('.options').classList.toggle('act')}><i class="fa-solid fa-ellipsis-vertical"></i></button>}
-                        <button className='settings' onClick={() => setSettings(!settings)}><i class="fa-solid fa-gear"></i>{settings && <div className="options-2"><p onClick={() => { setSettings(false); localStorage.clear(); navigate("/login") }}>Logout</p></div>}</button>
+                    <div className="right-bottom">
+                        {groupName ? <h1>Pinned Messages - {groupName}</h1> : null}
+                        <ul>
+                            {pinnedlist.map((element, key) => (
+                                <li key={key}>{element.message}<br /><span>{element.username}</span></li>
+                            ))}
+                        </ul>
                     </div>
                 </div>
-                <div className="center-bottom">
-                    <div className="options">
-                        <p onClick={leaveGroup}>Delete Group</p>
-                        <p> <strong>Group Info</strong> {members.map(element => (<span>{`${element}`}</span>))}</p>
+                <div className="right-box">
+                    <div className="right-top">
+                        <h1>{groupName}</h1>
+                        {user == Admin ? <button className='right-button' onClick={() => setShowTaskModal(true)}><i class="fa-solid fa-plus"></i></button> : ''}
+                        <ul>
+                            {task.map((element, key) => (
+                                <li key={key} style={{ opacity: element.task ? 1 : 0 }}>Task:  <span>{element.task}</span> <br></br> Assigned Person: <span>{element.person}</span> {element.person == user ? <button className='complete' onClick={() => deltask(key, element.task)}><i class="fa-solid fa-check"></i></button> : ''}</li>
+                            ))}
+                        </ul>
                     </div>
-                    <ul ref={scrollRef}>
-                        {messageList.map((element, key) => (
-                            element.group ? element.type == 'img' ? <img onClick={() => handleImgView(element.message)} style={{ alignSelf: element.sender == user ? 'flex-end' : 'flex-start', marginLeft: element.sender == user ? 0 : 15, marginRight: element.sender == user ? 15 : 0, zIndex: 2000 }} src={element.message} id='img-chat'></img> : <li key={key} style={{ maxWidth: '50%', height: 'fit-content', background: 'transparent', padding: 10, borderRadius: 10, borderWidth: 1, borderStyle: 'solid', borderColor: element.sender == user ? "#1db954" : 'white', color: 'white', listStyle: 'none', alignSelf: element.sender == user ? 'flex-end' : 'flex-start', marginLeft: element.sender == user ? 0 : 15, marginRight: element.sender == user ? 15 : 0 }}>{element.message}                         <p>{element.sender}</p><span onClick={() => savepinned(element.sender, element.message)} className='pinned'><i class="fa-solid fa-map-pin"></i></span></li> : ''
-                        ))}
-                    </ul>
-                    <div className="input-box">
-                        {groupName && <input className='inputt' type='text' placeholder='Enter your Message' onKeyDown={(e) => {
-                            if (e.key === 'Enter') {
-                                appendArr();
-                            }
-                        }}></input>}
-                        {groupName && <button onClick={appendArr}><i class="fa-solid fa-paper-plane"></i></button>}
-                        {groupName && <label htmlFor="file-upload" className="custom-file-upload"><i class="fa-solid fa-file"></i></label>}
-                        <input
-                            id="file-upload"
-                            type="file"
-                            onChange={handleUpload}
-                            style={{ display: "none" }}
-                        />                    </div>
+                    <div className="right-bottom">
+                        {groupName ? <h1>Pinned Messages - {groupName}</h1> : null}
+                        <ul>
+                            {pinnedlist.map((element, key) => (
+                                <li key={key}>{element.message}<br /><span>{element.username}</span></li>
+                            ))}
+                        </ul>
+                    </div>
                 </div>
-            </div>
-            <div className="right-box">
-                <div className="right-top">
-                    <h1>{groupName}</h1>
-                    {user == Admin ? <button className='right-button' onClick={addModule}><i class="fa-solid fa-plus"></i></button> : ''}
+                <div className="search-nav">
+                    <h1>Search New Groups</h1>
+                    <button className='cross' onClick={() => document.querySelector('.search-nav').classList.toggle('active-nav')}><i class="fa-solid fa-xmark"></i></button>
+                    <input id='searchinput' onChange={() => setSearchActivate(true)} placeholder="Enter your Group's name" onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                            getSearch();
+                        }
+                    }}></input>
                     <ul>
-                        {task.map((element, key) => (
-                            <li key={key} style={{ opacity: element.task ? 1 : 0 }}>Task:  <span>{element.task}</span> <br></br> Assigned Person: <span>{element.person}</span> {element.person == user ? <button className='complete' onClick={() => deltask(key, element.task)}><i class="fa-solid fa-check"></i></button> : ''}</li>
-                        ))}
-                    </ul>
-                </div>
-                <div className="right-bottom">
-                    {groupName ? <h1>Pinned Messages - {groupName}</h1> : null}
-                    <ul>
-                        {pinnedlist.map((element, key) => (
-                            <li key={key}>{element.message}<br /><span>{element.username}</span></li>
-                        ))}
-                    </ul>
-                </div>
-            </div>
-            <div className="search-nav">
-                <h1>Search New Groups</h1>
-                <button className='cross' onClick={() => document.querySelector('.search-nav').classList.toggle('active-nav')}><i class="fa-solid fa-xmark"></i></button>
-                <input id='searchinput' onChange={() => setSearchActivate(true)} placeholder="Enter your Group's name" onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                        getSearch();
-                    }
-                }}></input>
-                <ul>
-                    {searchData.map((element, key) => (
-                        <li key={key}>
-                            <h1>{element.Group}</h1>
-                            {element.Admin == user || element.Members.includes(user) ? '' : <button onClick={() => handleRequest(element.Group)}>Join</button>}
-                        </li>
-                    ))}
-                </ul>
-            </div>
-            <div className="request-tab">
-                <h1>Requests</h1>
-                <button className='cross' onClick={() => document.querySelector('.request-tab').classList.toggle('active-tab')}><i class="fa-solid fa-xmark"></i></button>
-                <ul>
-                    {requestList &&
-                        requestList.map((element, key) => (
+                        {searchData.map((element, key) => (
                             <li key={key}>
-                                <div className="txt">
-                                    <h1>{element.username}</h1>
-                                    <p>{element.group}</p>
-                                </div>
-                                <button onClick={() => {
-                                    reqCondition(element.username, "accept", element.group)
-                                    setRequestList(prev => prev.filter(item => item != element))
-                                }}>Accept</button>
-                                <button onClick={() => {
-                                    reqCondition(element.username, "reject", element.group)
-                                    setRequestList(prev => prev.filter(item => item != element))
-                                }}>Reject</button>
+                                <h1>{element.Group}</h1>
+                                {element.Admin == user || element.Members.includes(user) ? '' : <button onClick={() => handleRequest(element.Group)}>Join</button>}
                             </li>
-                        ))
-                    }
-                </ul>
-            </div>
+                        ))}
+                    </ul>
+                </div>
+                <div className="request-tab">
+                    <h1>Requests</h1>
+                    <button className='cross' onClick={() => document.querySelector('.request-tab').classList.toggle('active-tab')}><i class="fa-solid fa-xmark"></i></button>
+                    <ul>
+                        {requestList &&
+                            requestList.map((element, key) => (
+                                <li key={key}>
+                                    <div className="txt">
+                                        <h1>{element.username}</h1>
+                                        <p>{element.group}</p>
+                                    </div>
+                                    <button onClick={() => {
+                                        reqCondition(element.username, "accept", element.group)
+                                        setRequestList(prev => prev.filter(item => item != element))
+                                    }}>Accept</button>
+                                    <button onClick={() => {
+                                        reqCondition(element.username, "reject", element.group)
+                                        setRequestList(prev => prev.filter(item => item != element))
+                                    }}>Reject</button>
+                                </li>
+                            ))
+                        }
+                    </ul>
+                </div>
+                {/* ... other JSX ... */}
 
-        </div >
+                <AddTaskModal
+                    isOpen={showTaskModal}
+                    onClose={() => setShowTaskModal(false)}
+                    onAdd={addModule}
+                />
 
-    )
-}
 
-export default Chat
+            </div >
+
+        )
+    }
+
+    export default Chat

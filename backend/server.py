@@ -381,7 +381,7 @@ async def getchat(data: User, request:Request):
         check = verify_token(json)
         if not json or not check:
             return {"ERROR": "Invalid JSON"}
-        response = await collection5.find({"Members": data.usermail}).to_list(length = None)
+        response = await collection5.find({"Members": {"$in": [data.usermail]}}).to_list(length=None) 
         if(response):
             for i in response:
                 i['_id'] = str(i['_id'])
